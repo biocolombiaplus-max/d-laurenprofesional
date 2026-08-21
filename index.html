@@ -12,14 +12,15 @@
 <meta property="og:site_name" content="D'Laurent Professional Colombia">
 <meta property="og:title" content="D'Laurent Professional Colombia | Alisado Profesional en 1 Hora">
 <meta property="og:description" content="Distribuidor exclusivo D'Laurent Professional en Colombia. Alisado profesional orgánico, sin amoniaco, apto para cabello tinturado, hasta 70% más rápido.">
-<meta property="og:image" content="https://d-laurenprofesional.vercel.app/assets/img/og-image.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:image" content="https://d-laurenprofesional.vercel.app/assets/img/og-image.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1856">
+<meta property="og:image:height" content="974">
 <meta property="og:locale" content="es_CO">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="D'Laurent Professional Colombia | Alisado Profesional en 1 Hora">
 <meta name="twitter:description" content="Distribuidor exclusivo D'Laurent Professional en Colombia. Alisado profesional orgánico, sin amoniaco, apto para cabello tinturado, hasta 70% más rápido.">
-<meta name="twitter:image" content="https://d-laurenprofesional.vercel.app/assets/img/og-image.jpg">
+<meta name="twitter:image" content="https://d-laurenprofesional.vercel.app/assets/img/og-image.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,6 +29,17 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%232d1b4e%22/><text x=%2250%22 y=%2266%22 font-size=%2255%22 fill=%22%23c9a961%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22>L</text></svg>">
 </head>
 <body>
+
+<!-- ============ ICON SPRITE ============ -->
+<svg style="display:none" aria-hidden="true">
+  <symbol id="icon-chat" viewBox="0 0 24 24">
+    <path d="M4 12c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8c-1.2 0-2.3-.2-3.3-.6L4 20l1.1-4.2C4.4 14.6 4 13.3 4 12z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="icon-bag" viewBox="0 0 24 24">
+    <path d="M6.5 8h11l1 12.2a2 2 0 0 1-2 2.1H7.5a2 2 0 0 1-2-2.1L6.5 8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M9 8V6.5a3 3 0 0 1 6 0V8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+  </symbol>
+</svg>
 
 <!-- ============ TOP BAR ============ -->
 <div class="topbar">
@@ -59,7 +71,7 @@
     </nav>
     <div class="nav-actions">
       <a class="icon-btn" href="#" id="cartBtn" aria-label="Ver carrito">
-        🛍️
+        <svg class="icon"><use href="#icon-bag"/></svg>
         <span class="cart-count" id="cartCount">0</span>
       </a>
       <a class="btn btn-whatsapp btn-sm" id="headerWhatsapp" target="_blank" rel="noopener">WhatsApp</a>
@@ -85,9 +97,9 @@
   <div class="container hero-grid">
     <div>
       <div class="hero-badges reveal">
-        <span class="hero-badge">✦ 100% Orgánico</span>
-        <span class="hero-badge">✦ Sin Amoniaco</span>
-        <span class="hero-badge">✦ Apto Cabello Tinturado</span>
+        <span class="hero-badge">100% Orgánico</span>
+        <span class="hero-badge">Sin Amoniaco</span>
+        <span class="hero-badge">Apto Cabello Tinturado</span>
       </div>
       <h1 class="reveal">Alisado profesional <span class="accent">en 1 hora</span> o menos.</h1>
       <p class="lead reveal">Lleva tu salón al siguiente nivel con la línea de alisado D'Laurent Professional: reduce el tiempo del servicio hasta un <strong>70%</strong>, sin amoniaco, sin olor y con resultados de nivel premium en cabello tinturado o virgen.</p>
@@ -100,7 +112,7 @@
 
       <div class="hero-cta reveal">
         <a href="#productos" class="btn btn-gold">Quiero comprar ahora →</a>
-        <a href="#" id="heroWhatsapp" target="_blank" rel="noopener" class="btn btn-whatsapp">💬 Asesoría por WhatsApp</a>
+        <a href="#" id="heroWhatsapp" target="_blank" rel="noopener" class="btn btn-whatsapp"><svg class="icon"><use href="#icon-chat"/></svg> Asesoría por WhatsApp</a>
       </div>
     </div>
 
@@ -232,7 +244,7 @@
     <div class="cta-banner reveal-scale">
       <h3>¿Quieres ver precios especiales de mayorista o coordinar tu primer pedido?</h3>
       <div class="cta-actions">
-        <a href="#" id="ctaWhatsapp" target="_blank" rel="noopener" class="btn btn-whatsapp">💬 Hablar con un asesor</a>
+        <a href="#" id="ctaWhatsapp" target="_blank" rel="noopener" class="btn btn-whatsapp"><svg class="icon"><use href="#icon-chat"/></svg> Hablar con un asesor</a>
         <a href="#registro" class="btn btn-outline">Registrarme como distribuidor</a>
       </div>
     </div>
@@ -388,7 +400,7 @@
 </footer>
 
 <!-- ============ FLOATING WHATSAPP ============ -->
-<a href="#" id="fabWhatsapp" target="_blank" rel="noopener" class="fab-whatsapp" aria-label="Escríbenos por WhatsApp">💬</a>
+<a href="#" id="fabWhatsapp" target="_blank" rel="noopener" class="fab-whatsapp" aria-label="Escríbenos por WhatsApp"><svg class="icon" style="width:28px;height:28px"><use href="#icon-chat"/></svg></a>
 <div class="fab-tooltip" id="fabTooltip">¿Tienes dudas? Escríbenos ✍️</div>
 
 <!-- ============ TOAST ============ -->

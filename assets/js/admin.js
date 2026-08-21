@@ -361,6 +361,8 @@
     const fileInput = document.getElementById("heroFile");
     const previewBox = document.getElementById("heroPreviewBox");
     const previewImg = document.getElementById("heroPreviewImg");
+    const sizeRange = document.getElementById("heroSizeRange");
+    const sizeVal = document.getElementById("heroSizeVal");
 
     const isPhoto = !!siteImages.hero.usePhoto;
     document.querySelector(`input[name="heroMode"][value="${isPhoto ? "photo" : "illustration"}"]`).checked = true;
@@ -370,6 +372,14 @@
       previewImg.src = siteImages.hero.src;
       previewBox.hidden = false;
     }
+
+    sizeRange.value = siteImages.hero.sizePct || 100;
+    sizeVal.textContent = sizeRange.value + "%";
+    sizeRange.addEventListener("input", () => {
+      siteImages.hero.sizePct = Number(sizeRange.value);
+      sizeVal.textContent = sizeRange.value + "%";
+      scheduleSaveSiteImages();
+    });
 
     radios.forEach((r) =>
       r.addEventListener("change", () => {

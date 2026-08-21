@@ -20,6 +20,7 @@ const SITE_IMAGES = {
   hero: {
     usePhoto: false,
     src: "",
+    sizePct: 100,
   },
   sectionBackgrounds: {
     beneficios: { enabled: false, src: "", tone: "light", opacity: 88 },
