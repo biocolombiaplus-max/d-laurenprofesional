@@ -38,21 +38,28 @@ El sitio se entrega con:
 
 No se usaron fotos del sitio del fabricante porque el acceso a ese dominio no estuvo disponible durante la generación de este sitio — se recomienda usar fotografía y video propios (con autorización de las clientas) para mayor autenticidad y confianza.
 
-## Panel administrador (`/admin.html`)
+## Panel administrador (`/admin.html`) — publicación instantánea con Firebase
 
-Para que puedas agregar fotos y videos, cambiar la foto del hero y activar fondos de sección sin tocar código, el sitio incluye un panel visual en **`admin.html`**. Si ya publicaste el sitio (por ejemplo en Vercel), entras agregando `/admin.html` al final de tu dominio: `https://tu-sitio.vercel.app/admin.html`.
+El panel en **`admin.html`** está conectado a [Firebase](https://firebase.google.com/) (gratis) para que subir una foto o video se vea reflejado **al instante para todos tus visitantes**, sin descargar archivos ni hacer push a GitHub. Si ya publicaste el sitio (por ejemplo en Vercel), entras agregando `/admin.html` al final de tu dominio: `https://tu-sitio.vercel.app/admin.html`.
 
-1. Entra con el código de acceso (de fábrica: `dlaurent2024`, cámbialo en `assets/js/admin.js` → `ADMIN_PASSCODE`).
-2. El panel tiene **dos pestañas**:
-   - **📸 Fotos y videos (Resultados)**: sube el archivo, escribe la descripción y elige la categoría (Antes/Después, Cabello tinturado, Video del proceso, Resultado), ordena con las flechas ↑ ↓, y mira la vista previa. Botón de publicación: **"⬇ Descargar gallery-data.js"**.
-   - **🖼️ Imagen del hero y fondos**: reemplaza la ilustración del hero por una foto real, y/o activa una foto de fondo en cualquier sección (Beneficios, Resultados, Productos, Testimonios, Capacitación/Distribuidores, Preguntas frecuentes) — útil sobre todo en las secciones blancas para que se vean más ricas. Cada fondo lleva un **velo** (claro u oscuro, con intensidad ajustable) para que el texto se siga leyendo bien encima de la foto. Botón de publicación: **"⬇ Descargar site-images.js"**.
+### Configuración inicial (una sola vez)
 
-**Importante — cómo funciona (y sus límites):** este es un sitio 100% estático, sin servidor ni base de datos. El panel guarda tu progreso como borrador en el navegador (localStorage/IndexedDB) para que no lo pierdas entre visitas, pero **eso solo lo ves tú, en ese navegador** — no se publica automáticamente para tus visitantes. Para publicar de verdad:
-1. Sube tus fotos/videos originales a `assets/img/gallery/` o `assets/video/` (pestaña de galería) o a `assets/img/backgrounds/` (pestaña de hero/fondos) de tu proyecto, con el mismo nombre de archivo que se ve en cada tarjeta del panel.
-2. Descarga el archivo actualizado de la pestaña donde trabajaste (`gallery-data.js` o `site-images.js`) y reemplaza el archivo correspondiente dentro de `assets/js/` en tu proyecto.
-3. Sube los cambios a tu hosting (o haz commit y push si usas GitHub/Vercel) para que se vean en el sitio real — en Vercel, un push a la rama conectada vuelve a desplegar automáticamente.
+1. Crea un proyecto gratis en [Firebase Console](https://console.firebase.google.com/).
+2. Habilita **Firestore Database** (modo producción) y **Storage** (modo producción).
+3. Habilita **Authentication → Sign-in method → Correo electrónico/contraseña**, y en la pestaña "Users" crea tu usuario administrador (correo + contraseña) — ese será tu login del panel.
+4. En ⚙️ Configuración del proyecto → "Tus apps" → agrega una app Web y copia el bloque `firebaseConfig`.
+5. Pega esos 6 valores en `assets/js/firebase-config.js` (reemplaza los `"TU_..."`).
+6. En Firestore → pestaña "Reglas", y en Storage → pestaña "Reglas", aplica reglas que permitan lectura pública y escritura solo a usuarios autenticados (pídeselas a quien te ayudó a configurar esto, o revisa la documentación de Firebase de "Security Rules").
 
-Si en el futuro quieres que estos cambios se publiquen sin este paso manual (por ejemplo, para que varias personas puedan subir fotos desde el celular sin tocar el código), se necesitaría agregar un backend o un servicio de CMS — este panel es la solución más simple sin esos costos adicionales.
+Mientras `firebase-config.js` tenga los valores de fábrica (`"TU_API_KEY"`, etc.), el sitio sigue funcionando normal con el contenido local de `gallery-data.js` y `site-images.js`, y `admin.html` muestra un aviso de "panel no conectado" en vez del login — no se rompe nada por no tenerlo configurado todavía.
+
+### Uso diario
+
+Una vez conectado, inicias sesión con tu correo/contraseña y el panel tiene **dos pestañas**:
+- **📸 Fotos y videos (Resultados)**: sube el archivo, escribe la descripción y categoría, ordena con las flechas ↑ ↓. Cada cambio se sube a Firebase Storage y se guarda en Firestore de inmediato — no hay botón de "publicar", ya queda en línea.
+- **🖼️ Imagen del hero y fondos**: reemplaza la ilustración del hero por una foto real, y/o activa una foto de fondo en cualquier sección (Beneficios, Resultados, Productos, Testimonios, Capacitación/Distribuidores, Preguntas frecuentes), con un velo claro/oscuro ajustable para mantener el texto legible. También se publica al instante.
+
+Los archivos `gallery-data.js` y `site-images.js` locales quedan como **contenido de respaldo** (se usan solo si Firebase no está configurado o falla la conexión), así el sitio nunca se rompe por completo.
 
 ## Captura de leads (Capacitación / Distribuidores)
 

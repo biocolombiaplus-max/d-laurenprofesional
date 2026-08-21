@@ -28,7 +28,11 @@
   position: sticky; top: 0; z-index: 20;
 }
 .admin-header .logo-text .l2 { color: var(--gold-dark); }
-.admin-header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.admin-header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.admin-save-status { font-size: 12.5px; font-weight: 700; color: var(--success); display: flex; align-items: center; gap: 5px; }
+.admin-save-status.saving { color: var(--gold-dark); }
+.admin-save-status.error { color: var(--danger); }
+#gateError { color: var(--danger); font-weight: 700; }
 
 .admin-banner {
   background: #fff4d6; color: #7a5b12; font-size: 13.5px; padding: 12px 28px; border-bottom: 1px solid #f0e2ad; line-height: 1.6;

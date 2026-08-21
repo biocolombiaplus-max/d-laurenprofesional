@@ -11,6 +11,40 @@
   const waLink = (msg) => `${waBase}?text=${encodeURIComponent(msg)}`;
 
   /* ---------------------------------------------------------------------
+     Live content from Firebase (set from /admin.html). Falls back to the
+     local assets/js/gallery-data.js and assets/js/site-images.js if
+     Firebase isn't configured yet, or the fetch fails for any reason —
+     the site must never break because of this.
+     --------------------------------------------------------------------- */
+  async function loadLiveContent() {
+    if (typeof firebaseDb === "undefined" || !firebaseDb) return;
+    try {
+      const [gallerySnap, imagesSnap] = await Promise.all([
+        firebaseDb.collection("siteContent").doc("gallery").get(),
+        firebaseDb.collection("siteContent").doc("images").get(),
+      ]);
+      if (gallerySnap.exists && Array.isArray(gallerySnap.data().items)) {
+        GALLERY.length = 0;
+        GALLERY.push(...gallerySnap.data().items);
+      }
+      if (imagesSnap.exists) {
+        const data = imagesSnap.data();
+        if (data.hero) Object.assign(SITE_IMAGES.hero, data.hero);
+        if (data.sectionBackgrounds) {
+          Object.keys(data.sectionBackgrounds).forEach((key) => {
+            SITE_IMAGES.sectionBackgrounds[key] = Object.assign(
+              SITE_IMAGES.sectionBackgrounds[key] || {},
+              data.sectionBackgrounds[key]
+            );
+          });
+        }
+      }
+    } catch (err) {
+      console.warn("No se pudo cargar el contenido en vivo desde Firebase, usando el contenido local.", err);
+    }
+  }
+
+  /* ---------------------------------------------------------------------
      Site images: hero photo swap + per-section background photos
      (configured from /admin.html → assets/js/site-images.js)
      --------------------------------------------------------------------- */
@@ -507,8 +541,9 @@
   /* ---------------------------------------------------------------------
      Init
      --------------------------------------------------------------------- */
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("year").textContent = new Date().getFullYear();
+    await loadLiveContent();
     applySiteImages();
     wireWhatsappLinks();
     startCountdown();

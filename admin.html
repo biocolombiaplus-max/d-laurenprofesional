@@ -13,8 +13,8 @@
 </head>
 <body class="admin-body">
 
-<!-- ============ GATE ============ -->
-<div class="admin-gate" id="adminGate">
+<!-- ============ FIREBASE NOT CONFIGURED YET ============ -->
+<div class="admin-gate" id="adminNotConfigured" hidden>
   <div class="admin-gate-card">
     <div class="logo" style="justify-content:center;margin-bottom:18px">
       <span class="logo-mark" style="border-color:var(--purple-800);color:var(--purple-800)">L</span>
@@ -24,14 +24,32 @@
       </span>
     </div>
     <p class="admin-gate-note">
-      Este panel funciona 100% en tu navegador (no hay servidor ni base de datos).
-      El código de acceso es solo un filtro básico para evitar cambios accidentales —
-      <strong>no compartas este enlace públicamente</strong>. Puedes cambiar el código
-      en <code>assets/js/admin.js</code> (constante <code>ADMIN_PASSCODE</code>).
+      Este panel todavía no está conectado a Firebase. Completa la configuración en
+      <code>assets/js/firebase-config.js</code> (llaves de tu proyecto Firebase) para poder
+      iniciar sesión y publicar cambios en vivo.
     </p>
-    <input type="password" id="gatePasscode" placeholder="Código de acceso" autocomplete="off">
-    <button class="btn btn-gold btn-block" id="gateSubmit">Entrar al panel</button>
-    <p class="admin-gate-hint">Código de fábrica: <strong>dlaurent2024</strong></p>
+  </div>
+</div>
+
+<!-- ============ GATE (login) ============ -->
+<div class="admin-gate" id="adminGate" hidden>
+  <div class="admin-gate-card">
+    <div class="logo" style="justify-content:center;margin-bottom:18px">
+      <span class="logo-mark" style="border-color:var(--purple-800);color:var(--purple-800)">L</span>
+      <span class="logo-text">
+        <span class="l1" style="color:var(--purple-950)">D'LAURENT</span><br>
+        <span class="l2">PANEL ADMINISTRADOR</span>
+      </span>
+    </div>
+    <p class="admin-gate-note">
+      Inicia sesión con la cuenta que creaste en Firebase Authentication.
+      Los cambios que hagas aquí quedan <strong>en línea al instante</strong> para todos tus visitantes —
+      no compartas este enlace ni tu contraseña públicamente.
+    </p>
+    <input type="email" id="gateEmail" placeholder="Correo electrónico" autocomplete="username" style="margin-bottom:10px">
+    <input type="password" id="gatePasscode" placeholder="Contraseña" autocomplete="current-password">
+    <button class="btn btn-gold btn-block" id="gateSubmit" style="margin-top:14px">Entrar al panel</button>
+    <p class="admin-gate-hint" id="gateError"></p>
   </div>
 </div>
 
@@ -47,15 +65,14 @@
       </span>
     </div>
     <div class="admin-header-actions">
+      <span class="admin-save-status" id="saveStatus">✓ En línea</span>
       <a href="index.html" target="_blank" class="btn btn-outline btn-sm" style="color:var(--purple-800);border-color:var(--purple-800)">Ver landing ↗</a>
-      <button class="btn btn-dark btn-sm admin-tab-only" data-tab-btn="gallery" id="downloadBtn">⬇ Descargar gallery-data.js</button>
-      <button class="btn btn-dark btn-sm admin-tab-only" data-tab-btn="images" id="downloadImagesBtn" hidden>⬇ Descargar site-images.js</button>
+      <button class="btn btn-outline btn-sm" style="color:var(--danger);border-color:var(--danger)" id="logoutBtn">Cerrar sesión</button>
     </div>
   </header>
 
   <div class="admin-banner">
-    ℹ️ Los cambios se guardan automáticamente como borrador <strong>en este navegador</strong>. Para que se vean en tu sitio real,
-    debes descargar el archivo actualizado y subirlo a tu hosting junto con las fotos/videos. Ver instrucciones al final de cada pestaña.
+    ⚡ Los cambios que hagas aquí (fotos, videos, hero, fondos) se publican <strong>al instante</strong> para todos tus visitantes — no necesitas descargar ni subir nada más.
   </div>
 
   <nav class="admin-tabs">
@@ -94,21 +111,10 @@
         <p class="admin-hint" id="fileHint">Se recomienda que ya esté recortada en formato vertical (3:4) para verse igual que en la landing.</p>
       </div>
 
-      <div class="field">
-        <label id="srcPathLabel">Ruta del archivo (se autocompleta al elegir el archivo)</label>
-        <input type="text" id="itemSrcPath" placeholder="assets/img/gallery/mi-foto.jpg">
-        <p class="admin-hint">Este es el nombre con el que debes subir tu archivo real a <code>assets/img/gallery/</code> o <code>assets/video/</code>. Puedes editarlo.</p>
-      </div>
-
       <div class="field" id="posterFieldWrap" hidden>
         <label>Miniatura del video (opcional)</label>
         <input type="file" id="itemPoster" accept="image/*">
         <p class="admin-hint">Si no subes una miniatura, se usará una por defecto.</p>
-      </div>
-
-      <div class="field" id="posterPathWrap" hidden>
-        <label>Ruta de la miniatura</label>
-        <input type="text" id="itemPosterPath" placeholder="assets/img/gallery/mi-video-poster.jpg">
       </div>
 
       <div class="admin-preview-box" id="itemPreviewBox" hidden>
@@ -117,13 +123,13 @@
       </div>
 
       <button class="btn btn-gold btn-block" id="addItemBtn" style="margin-top:16px">+ Agregar a la galería</button>
+      <p class="admin-hint" id="uploadProgress"></p>
     </section>
 
     <!-- ---------- MANAGE LIST ---------- -->
     <section class="admin-card">
       <div class="admin-card-head">
         <h2>Elementos en la galería (<span id="itemCount">0</span>)</h2>
-        <button class="admin-link-btn" id="resetDraftBtn">Descartar borrador</button>
       </div>
       <p class="admin-hint">Usa las flechas para ordenar. Este orden es el que verán tus visitantes.</p>
       <div class="admin-manage-list" id="manageList"></div>
@@ -135,16 +141,6 @@
       <div class="gallery-grid" id="previewGrid" style="margin-top:18px"></div>
     </section>
 
-    <!-- ---------- PUBLISH INSTRUCTIONS ---------- -->
-    <section class="admin-card admin-card-wide admin-instructions">
-      <h2>Cómo publicar tus cambios</h2>
-      <ol>
-        <li>Sube tus fotos/videos originales a la carpeta <code>assets/img/gallery/</code> (fotos) o <code>assets/video/</code> (videos) de tu proyecto, <strong>con exactamente el mismo nombre de archivo</strong> que se muestra en cada tarjeta de arriba.</li>
-        <li>Haz clic en <strong>"⬇ Descargar gallery-data.js"</strong> y reemplaza el archivo <code>assets/js/gallery-data.js</code> de tu proyecto por el que acabas de descargar.</li>
-        <li>Sube los cambios a tu hosting (o haz commit y push si usas GitHub) para que todos los visitantes vean la galería actualizada.</li>
-      </ol>
-      <p class="admin-hint">¿No sabes subir archivos a tu repositorio? Envíale las fotos/videos y este mismo mensaje a quien te ayudó a construir la página, o pide soporte técnico.</p>
-    </section>
   </main>
 
   <!-- ============ TAB: HERO IMAGE + SECTION BACKGROUNDS ============ -->
@@ -162,12 +158,7 @@
         <div class="field">
           <label>Foto del hero</label>
           <input type="file" id="heroFile" accept="image/*">
-          <p class="admin-hint">Formato horizontal, ideal 4:3 o cuadrado. Que se vea bien sobre fondo morado oscuro.</p>
-        </div>
-        <div class="field">
-          <label>Ruta del archivo (se autocompleta al elegir el archivo)</label>
-          <input type="text" id="heroSrcPath" placeholder="assets/img/backgrounds/mi-foto-hero.jpg">
-          <p class="admin-hint">Sube tu archivo real a <code>assets/img/backgrounds/</code> con este mismo nombre.</p>
+          <p class="admin-hint">Formato horizontal, ideal 4:3 o cuadrado. Que se vea bien sobre fondo morado oscuro. Se publica al instante al seleccionarla.</p>
         </div>
         <div class="admin-preview-box" id="heroPreviewBox" style="max-width:280px" hidden>
           <img id="heroPreviewImg" alt="Vista previa del hero">
@@ -177,18 +168,8 @@
 
     <section class="admin-card admin-card-wide">
       <h2>Fondos de sección</h2>
-      <p class="admin-hint">Activa una foto de fondo en cualquier sección de la landing — especialmente útil en las secciones blancas para que se vean más ricas visualmente. Se aplica un velo (claro u oscuro) sobre la foto para que el texto se siga leyendo bien.</p>
+      <p class="admin-hint">Activa una foto de fondo en cualquier sección de la landing — especialmente útil en las secciones blancas para que se vean más ricas visualmente. Se aplica un velo (claro u oscuro) sobre la foto para que el texto se siga leyendo bien. Los cambios se publican al instante.</p>
       <div id="sectionBgList" style="margin-top:18px"></div>
-    </section>
-
-    <!-- ---------- PUBLISH INSTRUCTIONS (images) ---------- -->
-    <section class="admin-card admin-card-wide admin-instructions">
-      <h2>Cómo publicar estos cambios</h2>
-      <ol>
-        <li>Sube tus fotos originales a la carpeta <code>assets/img/backgrounds/</code> de tu proyecto, <strong>con exactamente el mismo nombre de archivo</strong> que se muestra arriba.</li>
-        <li>Haz clic en <strong>"⬇ Descargar site-images.js"</strong> (arriba a la derecha) y reemplaza el archivo <code>assets/js/site-images.js</code> de tu proyecto por el que acabas de descargar.</li>
-        <li>Sube los cambios a tu hosting (o haz commit y push si usas GitHub / Vercel) para que todos los visitantes vean el hero y los fondos actualizados.</li>
-      </ol>
     </section>
   </main>
 </div>
@@ -201,6 +182,11 @@
 <script src="assets/js/gallery-data.js"></script>
 <script src="assets/js/gallery-render.js"></script>
 <script src="assets/js/site-images.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="assets/js/firebase-config.js"></script>
 <script src="assets/js/admin.js"></script>
 </body>
 </html>
