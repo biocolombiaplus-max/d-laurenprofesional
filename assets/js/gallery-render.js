@@ -11,14 +11,27 @@ const GALLERY_CATEGORIES = {
 
 function galleryCardHTML(item, index) {
   const label = item.caption || "";
-  const posterSrc = item.type === "video" ? item.poster || item.src : item.src;
-  const playBtn = item.type === "video" ? `<span class="play">▶</span>` : "";
-  const img = posterSrc
-    ? `<img src="${posterSrc}" alt="${label}" loading="lazy">`
-    : `<span class="g-icon">${item.type === "video" ? "🎬" : "✨"}</span>`;
+  const isVideo = item.type === "video";
+  const playBtn = isVideo ? `<span class="play">▶</span>` : "";
+
+  let media;
+  if (isVideo && item.poster) {
+    // Video con miniatura subida manualmente.
+    media = `<img src="${item.poster}" alt="${label}" loading="lazy">`;
+  } else if (isVideo && item.src) {
+    // Sin miniatura: usamos el propio video y lo posicionamos en el
+    // segundo 0.5 para que se vea un fotograma real como "portada",
+    // sin necesidad de que el video se reproduzca.
+    media = `<video class="gallery-thumb-video" src="${item.src}#t=0.5" muted preload="metadata" playsinline></video>`;
+  } else if (!isVideo && item.src) {
+    media = `<img src="${item.src}" alt="${label}" loading="lazy">`;
+  } else {
+    media = `<span class="g-icon">${isVideo ? "🎬" : "✨"}</span>`;
+  }
+
   return `
     <div class="gallery-item" data-index="${index}" data-category="${item.category}" tabindex="0" role="button" aria-label="${label}">
-      ${img}
+      ${media}
       ${playBtn}
       <span class="g-label">${label}</span>
     </div>`;

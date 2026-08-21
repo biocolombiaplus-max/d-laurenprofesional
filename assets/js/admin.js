@@ -167,12 +167,19 @@
     }
     list.innerHTML = items
       .map((item, i) => {
-        const thumb = item.type === "video" ? item.poster || "" : item.src || "";
         const label = GALLERY_CATEGORIES[item.category] || item.category;
         const statusShown = item.type === "video" ? (item.src ? "Video listo" : "Sin video aún") : "Foto lista";
+        let thumbHtml;
+        if (item.type === "video" && item.poster) {
+          thumbHtml = `<img src="${item.poster}" alt="">`;
+        } else if (item.type === "video" && item.src) {
+          thumbHtml = `<video src="${item.src}#t=0.5" muted preload="metadata" playsinline></video>`;
+        } else {
+          thumbHtml = `<img src="${item.src || ""}" alt="">`;
+        }
         return `
         <div class="admin-manage-item">
-          <img src="${thumb}" alt="">
+          ${thumbHtml}
           <div class="mi-info">
             <div class="mi-caption">${escapeHtml(item.caption) || "(sin descripción)"}</div>
             <div class="mi-meta">${item.type === "video" ? "🎬 Video" : "🖼️ Foto"} · ${label} · ${statusShown}</div>
