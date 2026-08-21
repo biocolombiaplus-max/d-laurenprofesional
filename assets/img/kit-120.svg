@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" role="img" aria-label="Kit D'Laurent Professional 120ML">
+  <defs>
+    <linearGradient id="bg120" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3a1c5e"/>
+      <stop offset="100%" stop-color="#1a0f2e"/>
+    </linearGradient>
+    <linearGradient id="bottle120" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#efe3c8"/>
+      <stop offset="100%" stop-color="#c9a961"/>
+    </linearGradient>
+    <linearGradient id="glow120" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#c9a961" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#c9a961" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="500" fill="url(#bg120)"/>
+  <circle cx="290" cy="120" r="150" fill="url(#glow120)"/>
+  <circle cx="90" cy="420" r="110" fill="url(#glow120)"/>
+  <g>
+    <rect x="150" y="150" width="100" height="230" rx="14" fill="url(#bottle120)"/>
+    <rect x="168" y="110" width="64" height="46" rx="8" fill="#0d0714"/>
+    <rect x="178" y="90" width="44" height="26" rx="6" fill="#0d0714"/>
+    <rect x="160" y="200" width="80" height="120" rx="6" fill="#2d1b4e" opacity="0.9"/>
+    <text x="200" y="250" text-anchor="middle" font-family="Georgia, serif" font-size="15" fill="#c9a961" letter-spacing="2">D'LAURENT</text>
+    <text x="200" y="270" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#efe3c8" letter-spacing="3">PROFESSIONAL</text>
+    <text x="200" y="300" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" fill="#ffffff" font-weight="bold">120 ML</text>
+  </g>
+  <text x="200" y="450" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="#efe3c8" letter-spacing="1">Kit Presentación</text>
+</svg>

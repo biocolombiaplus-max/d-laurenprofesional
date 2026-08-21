@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" role="img" aria-label="Kit D'Laurent Professional 250ML">
+  <defs>
+    <linearGradient id="bg250" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4a2470"/>
+      <stop offset="100%" stop-color="#1a0f2e"/>
+    </linearGradient>
+    <linearGradient id="bottle250" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#efe3c8"/>
+      <stop offset="100%" stop-color="#c9a961"/>
+    </linearGradient>
+    <linearGradient id="glow250" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#c9a961" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#c9a961" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="500" fill="url(#bg250)"/>
+  <circle cx="300" cy="130" r="170" fill="url(#glow250)"/>
+  <circle cx="80" cy="410" r="120" fill="url(#glow250)"/>
+  <g>
+    <rect x="135" y="120" width="130" height="270" rx="16" fill="url(#bottle250)"/>
+    <rect x="160" y="75" width="80" height="52" rx="9" fill="#0d0714"/>
+    <rect x="172" y="52" width="56" height="30" rx="7" fill="#0d0714"/>
+    <rect x="148" y="180" width="104" height="150" rx="6" fill="#2d1b4e" opacity="0.9"/>
+    <text x="200" y="235" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="#c9a961" letter-spacing="2">D'LAURENT</text>
+    <text x="200" y="258" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#efe3c8" letter-spacing="3">PROFESSIONAL</text>
+    <text x="200" y="300" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#ffffff" font-weight="bold">250 ML</text>
+  </g>
+  <rect x="120" y="410" width="160" height="34" rx="17" fill="#c9a961"/>
+  <text x="200" y="433" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#1a0f2e" font-weight="bold" letter-spacing="1">MÁS VENDIDO</text>
+</svg>
