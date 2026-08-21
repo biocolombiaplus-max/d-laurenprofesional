@@ -1,5 +1,5 @@
 /* =========================================================================
-   PANEL ADMINISTRADOR — lógica (conectado a Firebase: Auth + Firestore + Storage)
+   PANEL ADMINISTRADOR — lógica (conectado a Supabase: Auth + Database + Storage)
    Los cambios se publican al instante para todos los visitantes del sitio.
    ========================================================================= */
 (function () {
@@ -51,35 +51,42 @@
   }
 
   /* ---------------------------------------------------------------------
-     Firebase Storage upload
+     Supabase Storage upload
      --------------------------------------------------------------------- */
   async function uploadFile(folder, file) {
     const path = `${folder}/${Date.now()}-${slugify(file.name)}`;
-    const ref = firebaseStorage.ref(path);
-    await ref.put(file);
-    return ref.getDownloadURL();
+    const { error } = await supabaseClient.storage.from("media").upload(path, file, { upsert: true });
+    if (error) throw error;
+    const { data } = supabaseClient.storage.from("media").getPublicUrl(path);
+    return data.publicUrl;
   }
 
   /* ---------------------------------------------------------------------
      Auth gate
      --------------------------------------------------------------------- */
   function initAuthGate() {
-    if (typeof firebaseAuth === "undefined" || !firebaseAuth) {
+    if (typeof supabaseClient === "undefined" || !supabaseClient) {
       document.getElementById("adminNotConfigured").hidden = false;
       return;
     }
 
-    firebaseAuth.onAuthStateChanged((user) => {
-      const gate = document.getElementById("adminGate");
-      const app = document.getElementById("adminApp");
-      if (user) {
-        gate.hidden = true;
-        app.hidden = false;
+    let appStarted = false;
+    function showApp() {
+      document.getElementById("adminGate").hidden = true;
+      document.getElementById("adminApp").hidden = false;
+      if (!appStarted) {
+        appStarted = true;
         initApp();
-      } else {
-        app.hidden = true;
-        gate.hidden = false;
       }
+    }
+    function showGate() {
+      document.getElementById("adminApp").hidden = true;
+      document.getElementById("adminGate").hidden = false;
+    }
+
+    supabaseClient.auth.onAuthStateChange((_event, session) => {
+      if (session) showApp();
+      else showGate();
     });
 
     function tryLogin() {
@@ -87,9 +94,11 @@
       const pass = document.getElementById("gatePasscode").value;
       const errorEl = document.getElementById("gateError");
       errorEl.textContent = "";
-      firebaseAuth.signInWithEmailAndPassword(email, pass).catch((err) => {
-        errorEl.textContent = "No se pudo iniciar sesión: correo o contraseña incorrectos.";
-        console.warn(err);
+      supabaseClient.auth.signInWithPassword({ email, password: pass }).then(({ error }) => {
+        if (error) {
+          errorEl.textContent = "No se pudo iniciar sesión: correo o contraseña incorrectos.";
+          console.warn(error);
+        }
       });
     }
     document.getElementById("gateSubmit").addEventListener("click", tryLogin);
@@ -102,7 +111,7 @@
   }
 
   function initLogout() {
-    document.getElementById("logoutBtn").addEventListener("click", () => firebaseAuth.signOut());
+    document.getElementById("logoutBtn").addEventListener("click", () => supabaseClient.auth.signOut());
   }
 
   /* ---------------------------------------------------------------------
@@ -123,15 +132,15 @@
   /* =======================================================================
      TAB 1 — Gallery (Resultados)
      ======================================================================= */
-  const galleryDocRef = () => firebaseDb.collection("siteContent").doc("gallery");
   let items = [];
 
   async function loadGalleryState() {
     try {
-      const snap = await galleryDocRef().get();
-      if (snap.exists && Array.isArray(snap.data().items)) return snap.data().items;
+      const { data, error } = await supabaseClient.from("site_content").select("data").eq("key", "gallery").maybeSingle();
+      if (error) throw error;
+      if (data && Array.isArray(data.data.items)) return data.data.items;
     } catch (e) {
-      console.warn("No se pudo leer la galería desde Firestore, usando el contenido local.", e);
+      console.warn("No se pudo leer la galería desde Supabase, usando el contenido local.", e);
     }
     return typeof GALLERY !== "undefined" ? JSON.parse(JSON.stringify(GALLERY)) : [];
   }
@@ -139,7 +148,8 @@
   async function saveGallery() {
     setSaveStatus("saving");
     try {
-      await galleryDocRef().set({ items });
+      const { error } = await supabaseClient.from("site_content").upsert({ key: "gallery", data: { items } });
+      if (error) throw error;
       setSaveStatus("ok");
     } catch (e) {
       console.error(e);
@@ -305,7 +315,6 @@
   /* =======================================================================
      TAB 2 — Hero image + section backgrounds
      ======================================================================= */
-  const imagesDocRef = () => firebaseDb.collection("siteContent").doc("images");
   const SECTION_DEFS = [
     { key: "beneficios", label: "Beneficios" },
     { key: "resultados", label: "Resultados" },
@@ -319,10 +328,11 @@
 
   async function loadSiteImagesState() {
     try {
-      const snap = await imagesDocRef().get();
-      if (snap.exists) return snap.data();
+      const { data, error } = await supabaseClient.from("site_content").select("data").eq("key", "images").maybeSingle();
+      if (error) throw error;
+      if (data) return data.data;
     } catch (e) {
-      console.warn("No se pudo leer la configuración de imágenes desde Firestore, usando el contenido local.", e);
+      console.warn("No se pudo leer la configuración de imágenes desde Supabase, usando el contenido local.", e);
     }
     return typeof SITE_IMAGES !== "undefined"
       ? JSON.parse(JSON.stringify(SITE_IMAGES))
@@ -334,7 +344,8 @@
     clearTimeout(saveImagesTimer);
     saveImagesTimer = setTimeout(async () => {
       try {
-        await imagesDocRef().set(siteImages);
+        const { error } = await supabaseClient.from("site_content").upsert({ key: "images", data: siteImages });
+        if (error) throw error;
         setSaveStatus("ok");
       } catch (e) {
         console.error(e);

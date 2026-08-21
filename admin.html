@@ -13,7 +13,7 @@
 </head>
 <body class="admin-body">
 
-<!-- ============ FIREBASE NOT CONFIGURED YET ============ -->
+<!-- ============ SUPABASE NOT CONFIGURED YET ============ -->
 <div class="admin-gate" id="adminNotConfigured" hidden>
   <div class="admin-gate-card">
     <div class="logo" style="justify-content:center;margin-bottom:18px">
@@ -24,8 +24,8 @@
       </span>
     </div>
     <p class="admin-gate-note">
-      Este panel todavía no está conectado a Firebase. Completa la configuración en
-      <code>assets/js/firebase-config.js</code> (llaves de tu proyecto Firebase) para poder
+      Este panel todavía no está conectado a Supabase. Completa la configuración en
+      <code>assets/js/supabase-config.js</code> (llaves de tu proyecto Supabase) para poder
       iniciar sesión y publicar cambios en vivo.
     </p>
   </div>
@@ -42,7 +42,7 @@
       </span>
     </div>
     <p class="admin-gate-note">
-      Inicia sesión con la cuenta que creaste en Firebase Authentication.
+      Inicia sesión con la cuenta que creaste en Supabase Authentication.
       Los cambios que hagas aquí quedan <strong>en línea al instante</strong> para todos tus visitantes —
       no compartas este enlace ni tu contraseña públicamente.
     </p>
@@ -182,11 +182,8 @@
 <script src="assets/js/gallery-data.js"></script>
 <script src="assets/js/gallery-render.js"></script>
 <script src="assets/js/site-images.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-<script src="assets/js/firebase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="assets/js/supabase-config.js"></script>
 <script src="assets/js/admin.js"></script>
 </body>
 </html>

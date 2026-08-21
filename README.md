@@ -38,28 +38,45 @@ El sitio se entrega con:
 
 No se usaron fotos del sitio del fabricante porque el acceso a ese dominio no estuvo disponible durante la generación de este sitio — se recomienda usar fotografía y video propios (con autorización de las clientas) para mayor autenticidad y confianza.
 
-## Panel administrador (`/admin.html`) — publicación instantánea con Firebase
+## Panel administrador (`/admin.html`) — publicación instantánea con Supabase
 
-El panel en **`admin.html`** está conectado a [Firebase](https://firebase.google.com/) (gratis) para que subir una foto o video se vea reflejado **al instante para todos tus visitantes**, sin descargar archivos ni hacer push a GitHub. Si ya publicaste el sitio (por ejemplo en Vercel), entras agregando `/admin.html` al final de tu dominio: `https://tu-sitio.vercel.app/admin.html`.
+El panel en **`admin.html`** está conectado a [Supabase](https://supabase.com/) (gratis, sin tarjeta de crédito) para que subir una foto o video se vea reflejado **al instante para todos tus visitantes**, sin descargar archivos ni hacer push a GitHub. Si ya publicaste el sitio (por ejemplo en Vercel), entras agregando `/admin.html` al final de tu dominio: `https://tu-sitio.vercel.app/admin.html`.
 
 ### Configuración inicial (una sola vez)
 
-1. Crea un proyecto gratis en [Firebase Console](https://console.firebase.google.com/).
-2. Habilita **Firestore Database** (modo producción) y **Storage** (modo producción).
-3. Habilita **Authentication → Sign-in method → Correo electrónico/contraseña**, y en la pestaña "Users" crea tu usuario administrador (correo + contraseña) — ese será tu login del panel.
-4. En ⚙️ Configuración del proyecto → "Tus apps" → agrega una app Web y copia el bloque `firebaseConfig`.
-5. Pega esos 6 valores en `assets/js/firebase-config.js` (reemplaza los `"TU_..."`).
-6. En Firestore → pestaña "Reglas", y en Storage → pestaña "Reglas", aplica reglas que permitan lectura pública y escritura solo a usuarios autenticados (pídeselas a quien te ayudó a configurar esto, o revisa la documentación de Firebase de "Security Rules").
+1. Crea una cuenta gratis en [supabase.com](https://supabase.com/) → "New Project" (no pide tarjeta).
+2. Ve a **SQL Editor** (menú izquierdo) → "New query" → pega y ejecuta (▶ Run) este script completo — crea la tabla de contenido, el bucket de archivos y los permisos correctos en un solo paso:
 
-Mientras `firebase-config.js` tenga los valores de fábrica (`"TU_API_KEY"`, etc.), el sitio sigue funcionando normal con el contenido local de `gallery-data.js` y `site-images.js`, y `admin.html` muestra un aviso de "panel no conectado" en vez del login — no se rompe nada por no tenerlo configurado todavía.
+   ```sql
+   create table if not exists site_content (
+     key text primary key,
+     data jsonb not null,
+     updated_at timestamptz default now()
+   );
+   alter table site_content enable row level security;
+   create policy "Public can read site content" on site_content for select using (true);
+   create policy "Authenticated can insert site content" on site_content for insert with check (auth.role() = 'authenticated');
+   create policy "Authenticated can update site content" on site_content for update using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+   insert into storage.buckets (id, name, public) values ('media', 'media', true) on conflict (id) do nothing;
+   create policy "Public can view media" on storage.objects for select using (bucket_id = 'media');
+   create policy "Authenticated can upload media" on storage.objects for insert with check (bucket_id = 'media' and auth.role() = 'authenticated');
+   create policy "Authenticated can update media" on storage.objects for update using (bucket_id = 'media' and auth.role() = 'authenticated');
+   ```
+
+3. Ve a **Authentication → Users** → "Add user" → pon tu correo y una contraseña → activa **"Auto Confirm User"** → Create user. Ese será tu login del panel.
+4. Ve a ⚙️ **Project Settings → API** → copia el "Project URL" y la llave "anon public".
+5. Pega esos 2 valores en `assets/js/supabase-config.js` (reemplaza los `"TU_..."`).
+
+Mientras `supabase-config.js` tenga los valores de fábrica (`"TU_SUPABASE_URL"`, etc.), el sitio sigue funcionando normal con el contenido local de `gallery-data.js` y `site-images.js`, y `admin.html` muestra un aviso de "panel no conectado" en vez del login — no se rompe nada por no tenerlo configurado todavía.
 
 ### Uso diario
 
 Una vez conectado, inicias sesión con tu correo/contraseña y el panel tiene **dos pestañas**:
-- **📸 Fotos y videos (Resultados)**: sube el archivo, escribe la descripción y categoría, ordena con las flechas ↑ ↓. Cada cambio se sube a Firebase Storage y se guarda en Firestore de inmediato — no hay botón de "publicar", ya queda en línea.
+- **📸 Fotos y videos (Resultados)**: sube el archivo, escribe la descripción y categoría, ordena con las flechas ↑ ↓. Cada cambio se sube a Supabase Storage y se guarda en la base de datos de inmediato — no hay botón de "publicar", ya queda en línea.
 - **🖼️ Imagen del hero y fondos**: reemplaza la ilustración del hero por una foto real, y/o activa una foto de fondo en cualquier sección (Beneficios, Resultados, Productos, Testimonios, Capacitación/Distribuidores, Preguntas frecuentes), con un velo claro/oscuro ajustable para mantener el texto legible. También se publica al instante.
 
-Los archivos `gallery-data.js` y `site-images.js` locales quedan como **contenido de respaldo** (se usan solo si Firebase no está configurado o falla la conexión), así el sitio nunca se rompe por completo.
+Los archivos `gallery-data.js` y `site-images.js` locales quedan como **contenido de respaldo** (se usan solo si Supabase no está configurado o falla la conexión), así el sitio nunca se rompe por completo.
 
 ## Captura de leads (Capacitación / Distribuidores)
 

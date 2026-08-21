@@ -11,36 +11,38 @@
   const waLink = (msg) => `${waBase}?text=${encodeURIComponent(msg)}`;
 
   /* ---------------------------------------------------------------------
-     Live content from Firebase (set from /admin.html). Falls back to the
+     Live content from Supabase (set from /admin.html). Falls back to the
      local assets/js/gallery-data.js and assets/js/site-images.js if
-     Firebase isn't configured yet, or the fetch fails for any reason —
+     Supabase isn't configured yet, or the fetch fails for any reason —
      the site must never break because of this.
      --------------------------------------------------------------------- */
   async function loadLiveContent() {
-    if (typeof firebaseDb === "undefined" || !firebaseDb) return;
+    if (typeof supabaseClient === "undefined" || !supabaseClient) return;
     try {
-      const [gallerySnap, imagesSnap] = await Promise.all([
-        firebaseDb.collection("siteContent").doc("gallery").get(),
-        firebaseDb.collection("siteContent").doc("images").get(),
-      ]);
-      if (gallerySnap.exists && Array.isArray(gallerySnap.data().items)) {
+      const { data, error } = await supabaseClient.from("site_content").select("key,data").in("key", ["gallery", "images"]);
+      if (error) throw error;
+
+      const galleryRow = (data || []).find((r) => r.key === "gallery");
+      const imagesRow = (data || []).find((r) => r.key === "images");
+
+      if (galleryRow && Array.isArray(galleryRow.data.items)) {
         GALLERY.length = 0;
-        GALLERY.push(...gallerySnap.data().items);
+        GALLERY.push(...galleryRow.data.items);
       }
-      if (imagesSnap.exists) {
-        const data = imagesSnap.data();
-        if (data.hero) Object.assign(SITE_IMAGES.hero, data.hero);
-        if (data.sectionBackgrounds) {
-          Object.keys(data.sectionBackgrounds).forEach((key) => {
+      if (imagesRow) {
+        const d = imagesRow.data;
+        if (d.hero) Object.assign(SITE_IMAGES.hero, d.hero);
+        if (d.sectionBackgrounds) {
+          Object.keys(d.sectionBackgrounds).forEach((key) => {
             SITE_IMAGES.sectionBackgrounds[key] = Object.assign(
               SITE_IMAGES.sectionBackgrounds[key] || {},
-              data.sectionBackgrounds[key]
+              d.sectionBackgrounds[key]
             );
           });
         }
       }
     } catch (err) {
-      console.warn("No se pudo cargar el contenido en vivo desde Firebase, usando el contenido local.", err);
+      console.warn("No se pudo cargar el contenido en vivo desde Supabase, usando el contenido local.", err);
     }
   }
 
