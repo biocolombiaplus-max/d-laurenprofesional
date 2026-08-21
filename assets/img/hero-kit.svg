@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 640" role="img" aria-label="Kit de alisado profesional D'Laurent Professional en 3 pasos">
+  <defs>
+    <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fffdf8"/>
+      <stop offset="100%" stop-color="#f0e6cf"/>
+    </linearGradient>
+    <linearGradient id="capGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4a2470"/>
+      <stop offset="100%" stop-color="#1f1236"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#c9a961" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#c9a961" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softShadow" x="-40%" y="-20%" width="180%" height="150%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#150c26" flood-opacity="0.35"/>
+    </filter>
+    <g id="bottle">
+      <rect x="-28" y="0" width="56" height="38" rx="10" fill="url(#capGrad)"/>
+      <rect x="-18" y="30" width="36" height="26" fill="url(#capGrad)"/>
+      <rect x="-70" y="54" width="140" height="248" rx="24" fill="url(#bodyGrad)" stroke="#c9a961" stroke-width="1.5"/>
+      <rect x="-55" y="108" width="110" height="146" rx="10" fill="#2d1b4e" opacity="0.94"/>
+      <text x="0" y="205" font-family="Georgia, serif" font-size="78" font-weight="700" fill="#ffffff" opacity="0.05" text-anchor="middle">D</text>
+      <text x="0" y="148" font-family="Georgia, serif" font-size="14" fill="#e8d4a0" letter-spacing="2.2" text-anchor="middle">D'LAURENT</text>
+      <text x="0" y="160" font-family="Arial, sans-serif" font-size="6.5" fill="#f8f4ec" letter-spacing="2.5" text-anchor="middle" opacity="0.85">PROFESSIONAL</text>
+      <line x1="-28" y1="169" x2="28" y2="169" stroke="#c9a961" stroke-width="1" opacity="0.5"/>
+    </g>
+  </defs>
+
+  <!-- ambient glow -->
+  <ellipse cx="450" cy="330" rx="280" ry="210" fill="url(#glow)"/>
+  <!-- decorative ring -->
+  <circle cx="450" cy="300" r="255" fill="none" stroke="#c9a961" stroke-width="1" stroke-dasharray="3 9" opacity="0.4"/>
+
+  <!-- botanicals: lavender bottom-left -->
+  <g stroke="#e8d4a0" stroke-width="2" fill="none" opacity="0.75" stroke-linecap="round">
+    <path d="M60 560 C 90 480 100 420 130 360"/>
+    <ellipse cx="112" cy="392" rx="7" ry="12" transform="rotate(-25 112 392)" fill="#5f2f8f" stroke="none" opacity="0.55"/>
+    <ellipse cx="121" cy="372" rx="6.5" ry="11" transform="rotate(-15 121 372)" fill="#5f2f8f" stroke="none" opacity="0.55"/>
+    <ellipse cx="103" cy="415" rx="7" ry="12" transform="rotate(-32 103 415)" fill="#5f2f8f" stroke="none" opacity="0.55"/>
+    <ellipse cx="128" cy="352" rx="6" ry="10" transform="rotate(-8 128 352)" fill="#5f2f8f" stroke="none" opacity="0.55"/>
+    <ellipse cx="94" cy="438" rx="7" ry="12" transform="rotate(-38 94 438)" fill="#5f2f8f" stroke="none" opacity="0.55"/>
+    <path d="M60 560 C 40 500 55 460 30 410"/>
+    <ellipse cx="42" cy="440" rx="6" ry="10" transform="rotate(20 42 440)" fill="#5f2f8f" stroke="none" opacity="0.5"/>
+    <ellipse cx="33" cy="420" rx="5.5" ry="9" transform="rotate(28 33 420)" fill="#5f2f8f" stroke="none" opacity="0.5"/>
+  </g>
+
+  <!-- botanicals: wheat top-right -->
+  <g stroke="#c9a961" stroke-width="2" fill="none" opacity="0.75" stroke-linecap="round">
+    <path d="M820 80 C 800 130 790 170 760 220"/>
+    <path d="M783 130 l14 -8 M783 130 l-6 -15 M797 108 l14 -8 M797 108 l-6 -15 M770 155 l14 -8 M770 155 l-6 -15 M812 88 l12 -7 M812 88 l-6 -13"/>
+  </g>
+  <g stroke="#c9a961" stroke-width="2" fill="none" opacity="0.7" stroke-linecap="round">
+    <path d="M850 520 C 828 470 815 440 780 400"/>
+    <path d="M810 460 l14 -6 M810 460 l-3 -15 M796 430 l13 -6 M796 430 l-3 -15 M824 488 l13 -6 M824 488 l-3 -15"/>
+  </g>
+
+  <!-- botanicals: argan nuts right -->
+  <g fill="#c9a961" opacity="0.55">
+    <circle cx="812" cy="300" r="7"/>
+    <circle cx="830" cy="316" r="6"/>
+    <circle cx="822" cy="335" r="5.5"/>
+  </g>
+  <g stroke="#e8d4a0" stroke-width="2" fill="none" opacity="0.6" stroke-linecap="round">
+    <path d="M800 280 C 812 260 828 255 840 265"/>
+  </g>
+
+  <!-- bottle 1 (left) -->
+  <g transform="translate(255,225) rotate(-7) scale(0.82)" filter="url(#softShadow)">
+    <use href="#bottle"/>
+    <text x="0" y="188" font-family="Arial, sans-serif" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">CHAMPÚ DE</text>
+    <text x="0" y="201" font-family="Arial, sans-serif" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">LIMPIEZA PROFUNDA</text>
+    <text x="0" y="235" font-family="Arial, sans-serif" font-size="13" font-weight="800" fill="#e8d4a0" text-anchor="middle">PASO 1</text>
+    <circle cx="0" cy="-14" r="22" fill="#c9a961" stroke="#150c26" stroke-width="2"/>
+    <text x="0" y="-6" font-family="Arial, sans-serif" font-size="21" font-weight="800" fill="#150c26" text-anchor="middle">1</text>
+  </g>
+
+  <!-- bottle 2 (center, tallest) -->
+  <g transform="translate(450,110)" filter="url(#softShadow)">
+    <use href="#bottle"/>
+    <text x="0" y="184" font-family="Arial, sans-serif" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">CREMA ALISADORA</text>
+    <text x="0" y="197" font-family="Arial, sans-serif" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">ANTIFRIZZ CAPILAR</text>
+    <text x="0" y="235" font-family="Arial, sans-serif" font-size="13" font-weight="800" fill="#e8d4a0" text-anchor="middle">PASO 2</text>
+    <circle cx="0" cy="-14" r="24" fill="#c9a961" stroke="#150c26" stroke-width="2"/>
+    <text x="0" y="-5" font-family="Arial, sans-serif" font-size="23" font-weight="800" fill="#150c26" text-anchor="middle">2</text>
+  </g>
+
+  <!-- bottle 3 (right) -->
+  <g transform="translate(645,225) rotate(7) scale(0.82)" filter="url(#softShadow)">
+    <use href="#bottle"/>
+    <text x="0" y="188" font-family="Arial, sans-serif" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">MASCARILLA</text>
+    <text x="0" y="201" font-family="Arial, sans-serif" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">NEUTRALIZANTE</text>
+    <text x="0" y="235" font-family="Arial, sans-serif" font-size="13" font-weight="800" fill="#e8d4a0" text-anchor="middle">PASO 3</text>
+    <circle cx="0" cy="-14" r="22" fill="#c9a961" stroke="#150c26" stroke-width="2"/>
+    <text x="0" y="-6" font-family="Arial, sans-serif" font-size="21" font-weight="800" fill="#150c26" text-anchor="middle">3</text>
+  </g>
+</svg>

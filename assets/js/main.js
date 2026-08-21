@@ -442,15 +442,27 @@
   }
 
   /* ---------------------------------------------------------------------
-     Gallery tab filter (visual only placeholder)
+     Gallery: render, filter by category, lightbox
      --------------------------------------------------------------------- */
-  function initGalleryTabs() {
+  let galleryFiltered = GALLERY.slice();
+
+  function applyGalleryFilter(cat) {
+    galleryFiltered = cat === "todos" ? GALLERY.slice() : GALLERY.filter((g) => g.category === cat);
+    renderGalleryGrid(document.getElementById("galleryGrid"), galleryFiltered);
+  }
+
+  function initGallery() {
+    applyGalleryFilter("todos");
     document.querySelectorAll(".gallery-tab").forEach((tab) => {
       tab.addEventListener("click", () => {
         document.querySelectorAll(".gallery-tab").forEach((t) => t.classList.remove("active"));
         tab.classList.add("active");
+        applyGalleryFilter(tab.dataset.cat);
       });
     });
+    initGalleryLightbox(document.getElementById("galleryGrid"), () => galleryFiltered, () =>
+      showToast("Este video estará disponible muy pronto")
+    );
   }
 
   /* ---------------------------------------------------------------------
@@ -482,7 +494,7 @@
     renderTestimonials();
     renderFaq();
     initForms();
-    initGalleryTabs();
+    initGallery();
     initHeaderScroll();
 
     setTimeout(() => {

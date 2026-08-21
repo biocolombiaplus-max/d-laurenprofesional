@@ -6,10 +6,16 @@ Landing page de ventas para la línea de **Alisado Profesional D'Laurent**, dist
 
 ```
 index.html                 → toda la landing (hero, beneficios, productos, testimonios, formularios, FAQ, footer)
-assets/css/style.css       → estilos (paleta morado + dorado, animaciones, responsive)
+admin.html                 → panel administrador para gestionar la galería de fotos/videos (ver más abajo)
+assets/css/style.css       → estilos del sitio (paleta morado + dorado, animaciones, responsive)
+assets/css/admin.css       → estilos propios del panel administrador
 assets/js/data.js          → CONFIGURACIÓN EDITABLE (WhatsApp, Nequi, Wompi, productos, precios, reseñas, FAQ)
-assets/js/main.js          → lógica del sitio (carrito, formularios, carrusel, countdown, etc.)
-assets/img/                → imágenes de productos (SVG editables) y espacio para fotos/videos reales
+assets/js/gallery-data.js  → contenido EDITABLE de la galería "Resultados" (fotos y videos)
+assets/js/gallery-render.js→ lógica compartida para dibujar la galería (sitio público y panel admin)
+assets/js/main.js          → lógica del sitio (carrito, formularios, carrusel, countdown, lightbox, etc.)
+assets/js/admin.js         → lógica del panel administrador
+assets/img/                → imágenes de producto (SVG editables) y assets/img/gallery/ para fotos reales
+assets/video/               → carpeta para tus videos reales del proceso
 ```
 
 ## Qué editar primero (`assets/js/data.js`)
@@ -25,12 +31,26 @@ assets/img/                → imágenes de productos (SVG editables) y espacio 
 ## Fotos y videos reales
 
 El sitio se entrega con:
-- **Imágenes de producto**: ilustraciones vectoriales (SVG) en `assets/img/kit-120.svg`, `kit-250.svg`, `kit-500.svg` con la paleta de marca. Puedes reemplazarlas por fotografías reales de los empaques (mismo nombre de archivo, o actualiza la ruta `image` en `data.js`).
-- **Sección "Resultados" (antes/después y videos)**: quedó con tarjetas de marcador de posición (`index.html`, sección `id="resultados"`) listas para recibir tus fotos y videos reales de clientas y salones. No se usaron fotos del sitio del fabricante porque el acceso a ese dominio no estuvo disponible durante la generación de este sitio — se recomienda usar fotografía propia (con autorización) para mayor autenticidad y confianza.
+- **Imágenes de producto** (hero y tarjetas de producto): ilustraciones vectoriales (SVG) en `assets/img/hero-kit.svg`, `kit-120.svg`, `kit-250.svg`, `kit-500.svg`, con la paleta de marca (frascos, botánicos, numeración de pasos). Puedes reemplazar cualquiera de estos archivos por una fotografía real (mismo nombre de archivo, o cambia la ruta `src`/`image` en `index.html` y `assets/js/data.js`).
+- **Sección "Resultados"** (antes/después y videos del proceso): funciona con datos reales desde `assets/js/gallery-data.js`, con filtros por categoría y una ventana emergente (lightbox) para ver cada foto o video en grande. Se entrega con 6 elementos de ejemplo — reemplázalos por tus fotos y videos reales usando el **panel administrador** descrito abajo.
 
-Para agregar una foto o video real:
-1. Coloca el archivo en `assets/img/` (fotos) o `assets/video/` (videos).
-2. En `index.html`, dentro de `.gallery-grid`, reemplaza el `<div class="gallery-item">` correspondiente por una imagen (`<img src="assets/img/tu-foto.jpg">`) o un video.
+No se usaron fotos del sitio del fabricante porque el acceso a ese dominio no estuvo disponible durante la generación de este sitio — se recomienda usar fotografía y video propios (con autorización de las clientas) para mayor autenticidad y confianza.
+
+## Panel administrador (`/admin.html`)
+
+Para que puedas agregar fotos y videos de resultados sin tocar código, el sitio incluye un panel visual en **`admin.html`**:
+
+1. Ábrelo en tu navegador y entra con el código de acceso (de fábrica: `dlaurent2024`, cámbialo en `assets/js/admin.js` → `ADMIN_PASSCODE`).
+2. Agrega una foto o video: sube el archivo, escribe la descripción y elige la categoría (Antes/Después, Cabello tinturado, Video del proceso, Resultado).
+3. Ordena los elementos con las flechas ↑ ↓, edítalos o elimínalos, y mira la **vista previa** de cómo se verán exactamente en tu landing.
+4. Cuando estés conforme, haz clic en **"⬇ Descargar gallery-data.js"**.
+
+**Importante — cómo funciona (y sus límites):** este es un sitio 100% estático, sin servidor ni base de datos. El panel guarda tu progreso como borrador en el navegador (localStorage/IndexedDB) para que no lo pierdas entre visitas, pero **eso solo lo ves tú, en ese navegador** — no se publica automáticamente para tus visitantes. Para publicar de verdad:
+1. Sube tus fotos/videos originales a `assets/img/gallery/` (fotos) o `assets/video/` (videos) de tu proyecto, con el mismo nombre de archivo que se ve en cada tarjeta del panel.
+2. Reemplaza `assets/js/gallery-data.js` por el archivo que descargaste del panel.
+3. Sube los cambios a tu hosting (o haz commit y push si usas GitHub) para que se vean en el sitio real.
+
+Si en el futuro quieres que la galería se actualice sin este paso manual (por ejemplo, para que varias personas puedan subir fotos desde el celular sin tocar el código), se necesitaría agregar un backend o un servicio de CMS — este panel es la solución más simple sin esos costos adicionales.
 
 ## Captura de leads (Capacitación / Distribuidores)
 

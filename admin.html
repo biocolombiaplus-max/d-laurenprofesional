@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel administrador — Galería D'Laurent Professional</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body class="admin-body">
+
+<!-- ============ GATE ============ -->
+<div class="admin-gate" id="adminGate">
+  <div class="admin-gate-card">
+    <div class="logo" style="justify-content:center;margin-bottom:18px">
+      <span class="logo-mark" style="border-color:var(--purple-800);color:var(--purple-800)">L</span>
+      <span class="logo-text">
+        <span class="l1" style="color:var(--purple-950)">D'LAURENT</span><br>
+        <span class="l2">PANEL ADMINISTRADOR</span>
+      </span>
+    </div>
+    <p class="admin-gate-note">
+      Este panel funciona 100% en tu navegador (no hay servidor ni base de datos).
+      El código de acceso es solo un filtro básico para evitar cambios accidentales —
+      <strong>no compartas este enlace públicamente</strong>. Puedes cambiar el código
+      en <code>assets/js/admin.js</code> (constante <code>ADMIN_PASSCODE</code>).
+    </p>
+    <input type="password" id="gatePasscode" placeholder="Código de acceso" autocomplete="off">
+    <button class="btn btn-gold btn-block" id="gateSubmit">Entrar al panel</button>
+    <p class="admin-gate-hint">Código de fábrica: <strong>dlaurent2024</strong></p>
+  </div>
+</div>
+
+<!-- ============ ADMIN APP ============ -->
+<div class="admin-app" id="adminApp" hidden>
+
+  <header class="admin-header">
+    <div class="logo">
+      <span class="logo-mark" style="border-color:var(--purple-800);color:var(--purple-800)">L</span>
+      <span class="logo-text">
+        <span class="l1" style="color:var(--purple-950)">D'LAURENT</span><br>
+        <span class="l2">PANEL ADMINISTRADOR · GALERÍA</span>
+      </span>
+    </div>
+    <div class="admin-header-actions">
+      <a href="index.html" target="_blank" class="btn btn-outline btn-sm" style="color:var(--purple-800);border-color:var(--purple-800)">Ver landing ↗</a>
+      <button class="btn btn-dark btn-sm" id="downloadBtn">⬇ Descargar gallery-data.js</button>
+    </div>
+  </header>
+
+  <div class="admin-banner">
+    ℹ️ Los cambios se guardan automáticamente como borrador <strong>en este navegador</strong>. Para que se vean en tu sitio real,
+    debes descargar el archivo actualizado y subirlo a tu hosting junto con las fotos/videos. Ver instrucciones al final de esta página.
+  </div>
+
+  <main class="admin-grid">
+    <!-- ---------- FORM: add item ---------- -->
+    <section class="admin-card">
+      <h2>Agregar foto o video</h2>
+
+      <div class="admin-field-row">
+        <label class="admin-radio"><input type="radio" name="itemType" value="image" checked> 🖼️ Foto</label>
+        <label class="admin-radio"><input type="radio" name="itemType" value="video"> 🎬 Video</label>
+      </div>
+
+      <div class="field">
+        <label>Descripción / leyenda</label>
+        <input type="text" id="itemCaption" placeholder="Ej: Antes / Después — Alisado en 1 hora">
+      </div>
+
+      <div class="field">
+        <label>Categoría</label>
+        <select id="itemCategory">
+          <option value="antes-despues">Antes / Después</option>
+          <option value="tinturado">Cabello tinturado</option>
+          <option value="video">Videos del proceso</option>
+          <option value="resultado">Resultado</option>
+        </select>
+      </div>
+
+      <div class="field" id="fileFieldWrap">
+        <label id="fileFieldLabel">Foto (JPG, PNG o WEBP)</label>
+        <input type="file" id="itemFile" accept="image/*">
+        <p class="admin-hint" id="fileHint">Se recomienda que ya esté recortada en formato vertical (3:4) para verse igual que en la landing.</p>
+      </div>
+
+      <div class="field">
+        <label id="srcPathLabel">Ruta del archivo (se autocompleta al elegir el archivo)</label>
+        <input type="text" id="itemSrcPath" placeholder="assets/img/gallery/mi-foto.jpg">
+        <p class="admin-hint">Este es el nombre con el que debes subir tu archivo real a <code>assets/img/gallery/</code> o <code>assets/video/</code>. Puedes editarlo.</p>
+      </div>
+
+      <div class="field" id="posterFieldWrap" hidden>
+        <label>Miniatura del video (opcional)</label>
+        <input type="file" id="itemPoster" accept="image/*">
+        <p class="admin-hint">Si no subes una miniatura, se usará una por defecto.</p>
+      </div>
+
+      <div class="field" id="posterPathWrap" hidden>
+        <label>Ruta de la miniatura</label>
+        <input type="text" id="itemPosterPath" placeholder="assets/img/gallery/mi-video-poster.jpg">
+      </div>
+
+      <div class="admin-preview-box" id="itemPreviewBox" hidden>
+        <img id="itemPreviewImg" alt="Vista previa">
+        <span id="itemPreviewLabel"></span>
+      </div>
+
+      <button class="btn btn-gold btn-block" id="addItemBtn" style="margin-top:16px">+ Agregar a la galería</button>
+    </section>
+
+    <!-- ---------- MANAGE LIST ---------- -->
+    <section class="admin-card">
+      <div class="admin-card-head">
+        <h2>Elementos en la galería (<span id="itemCount">0</span>)</h2>
+        <button class="admin-link-btn" id="resetDraftBtn">Descartar borrador</button>
+      </div>
+      <p class="admin-hint">Usa las flechas para ordenar. Este orden es el que verán tus visitantes.</p>
+      <div class="admin-manage-list" id="manageList"></div>
+    </section>
+
+    <!-- ---------- LIVE PREVIEW ---------- -->
+    <section class="admin-card admin-card-wide">
+      <h2>Vista previa — así se ve en tu landing</h2>
+      <div class="gallery-grid" id="previewGrid" style="margin-top:18px"></div>
+    </section>
+
+    <!-- ---------- PUBLISH INSTRUCTIONS ---------- -->
+    <section class="admin-card admin-card-wide admin-instructions">
+      <h2>Cómo publicar tus cambios</h2>
+      <ol>
+        <li>Sube tus fotos/videos originales a la carpeta <code>assets/img/gallery/</code> (fotos) o <code>assets/video/</code> (videos) de tu proyecto, <strong>con exactamente el mismo nombre de archivo</strong> que se muestra en cada tarjeta de arriba.</li>
+        <li>Haz clic en <strong>"⬇ Descargar gallery-data.js"</strong> y reemplaza el archivo <code>assets/js/gallery-data.js</code> de tu proyecto por el que acabas de descargar.</li>
+        <li>Sube los cambios a tu hosting (o haz commit y push si usas GitHub) para que todos los visitantes vean la galería actualizada.</li>
+      </ol>
+      <p class="admin-hint">¿No sabes subir archivos a tu repositorio? Envíale las fotos/videos y este mismo mensaje a quien te ayudó a construir la página, o pide soporte técnico.</p>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast">
+  <span class="tick">✓</span>
+  <span id="toastText">Guardado</span>
+</div>
+
+<script src="assets/js/gallery-data.js"></script>
+<script src="assets/js/gallery-render.js"></script>
+<script src="assets/js/admin.js"></script>
+</body>
+</html>

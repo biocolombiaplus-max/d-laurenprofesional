@@ -89,11 +89,9 @@
     </div>
 
     <div class="hero-visual reveal-scale">
-      <div class="hero-card">
-        <img src="assets/img/kit-250.svg" alt="D'Laurent Professional Kit 250ML">
-        <div class="floating-chip c1"><span class="num">-70%</span><div><small>Tiempo de</small><small>aplicación</small></div></div>
-        <div class="floating-chip c2"><span class="num">★5.0</span><div><small>Calificación</small><small>de estilistas</small></div></div>
-      </div>
+      <img class="hero-kit-img" src="assets/img/hero-kit.svg" alt="Kit de alisado profesional D'Laurent Professional en 3 pasos: champú de limpieza profunda, crema alisadora y mascarilla neutralizante">
+      <div class="floating-chip c1"><span class="num">-70%</span><div><small>Tiempo de</small><small>aplicación</small></div></div>
+      <div class="floating-chip c2"><span class="num">★5.0</span><div><small>Calificación</small><small>de estilistas</small></div></div>
     </div>
   </div>
 
@@ -180,21 +178,25 @@
       <h2>Antes &amp; después que hablan por sí solos</h2>
       <p>Estilistas en toda Colombia ya están transformando su servicio de alisado. Muy pronto verás aquí las fotos y videos de nuestros salones aliados.</p>
     </div>
-    <div class="gallery-tabs reveal">
-      <span class="gallery-tab active">Todos</span>
-      <span class="gallery-tab">Cabello tinturado</span>
-      <span class="gallery-tab">Antes / Después</span>
-      <span class="gallery-tab">Videos del proceso</span>
+    <div class="gallery-tabs reveal" id="galleryTabs">
+      <span class="gallery-tab active" data-cat="todos">Todos</span>
+      <span class="gallery-tab" data-cat="tinturado">Cabello tinturado</span>
+      <span class="gallery-tab" data-cat="antes-despues">Antes / Después</span>
+      <span class="gallery-tab" data-cat="video">Videos del proceso</span>
     </div>
-    <div class="gallery-grid stagger">
-      <div class="gallery-item reveal" style="--i:0"><span class="g-icon">✂️</span><span class="g-label">Antes / Después — Cabello tinturado</span></div>
-      <div class="gallery-item reveal" style="--i:1"><span class="g-icon">🎬</span><span class="play">▶</span><span class="g-label">Video: proceso completo en 1 hora</span></div>
-      <div class="gallery-item reveal" style="--i:2"><span class="g-icon">✨</span><span class="g-label">Brillo y sedosidad profesional</span></div>
-      <div class="gallery-item reveal" style="--i:3"><span class="g-icon">🎬</span><span class="play">▶</span><span class="g-label">Video: aplicación paso a paso</span></div>
-    </div>
-    <p class="gallery-note">📸 Espacio reservado para fotos y videos reales de resultados — se actualiza continuamente con nuestros salones aliados en Colombia.</p>
+    <div class="gallery-grid stagger" id="galleryGrid"></div>
+    <p class="gallery-note">📸 ¿Eres estilista aliado? Envíanos tus fotos y videos por WhatsApp y los sumamos a esta galería.</p>
   </div>
 </section>
+
+<!-- ============ LIGHTBOX ============ -->
+<div class="modal lightbox-modal" id="lightboxModal">
+  <div class="modal-box lightbox-box">
+    <button class="modal-close" id="lightboxClose">✕</button>
+    <div class="lightbox-body" id="lightboxBody"></div>
+    <p class="lightbox-caption" id="lightboxCaption"></p>
+  </div>
+</div>
 
 <!-- ============ PRODUCTS ============ -->
 <section class="section-pad" id="productos">
@@ -364,7 +366,7 @@
     </div>
     <div class="footer-bottom">
       <span>© <span id="year"></span> D'Laurent Professional Colombia. Distribuidor exclusivo autorizado.</span>
-      <span>Hecho con 💜 para estilistas colombianos</span>
+      <span><a href="admin.html" style="color:rgba(255,255,255,.35)">Panel administrador</a> · Hecho con 💜 para estilistas colombianos</span>
     </div>
   </div>
 </footer>
@@ -424,6 +426,8 @@
 </div>
 
 <script src="assets/js/data.js"></script>
+<script src="assets/js/gallery-data.js"></script>
+<script src="assets/js/gallery-render.js"></script>
 <script src="assets/js/main.js"></script>
 </body>
 </html>
