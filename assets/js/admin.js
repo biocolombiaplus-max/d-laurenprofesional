@@ -405,15 +405,225 @@
   }
 
   /* ---------------------------------------------------------------------
+     Tabs
+     --------------------------------------------------------------------- */
+  function initTabs() {
+    const tabs = document.querySelectorAll(".admin-tab");
+    tabs.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const tab = btn.dataset.tab;
+        tabs.forEach((b) => b.classList.toggle("active", b === btn));
+        document.getElementById("tabGallery").hidden = tab !== "gallery";
+        document.getElementById("tabImages").hidden = tab !== "images";
+        document.getElementById("downloadBtn").hidden = tab !== "gallery";
+        document.getElementById("downloadImagesBtn").hidden = tab !== "images";
+      });
+    });
+  }
+
+  /* ---------------------------------------------------------------------
+     Tab: Hero image + section backgrounds (assets/js/site-images.js)
+     --------------------------------------------------------------------- */
+  const SITE_IMAGES_DRAFT_KEY = "dlaurent_site_images_draft";
+  const SECTION_DEFS = [
+    { key: "beneficios", label: "Beneficios" },
+    { key: "resultados", label: "Resultados" },
+    { key: "productos", label: "Productos" },
+    { key: "testimonios", label: "Testimonios" },
+    { key: "registro", label: "Capacitación / Distribuidores" },
+    { key: "faq", label: "Preguntas frecuentes" },
+  ];
+  let siteImages = null;
+
+  function escapeHtml(str) {
+    return String(str || "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  function loadSiteImagesState() {
+    const draft = localStorage.getItem(SITE_IMAGES_DRAFT_KEY);
+    if (draft) {
+      try {
+        return JSON.parse(draft);
+      } catch (e) {
+        /* borrador corrupto: usar el archivo original */
+      }
+    }
+    return typeof SITE_IMAGES !== "undefined"
+      ? JSON.parse(JSON.stringify(SITE_IMAGES))
+      : { hero: { usePhoto: false, src: "" }, sectionBackgrounds: {} };
+  }
+
+  function saveSiteImagesDraft() {
+    localStorage.setItem(SITE_IMAGES_DRAFT_KEY, JSON.stringify(siteImages));
+  }
+
+  async function initHeroForm() {
+    const radios = document.querySelectorAll('input[name="heroMode"]');
+    const photoFields = document.getElementById("heroPhotoFields");
+    const fileInput = document.getElementById("heroFile");
+    const pathInput = document.getElementById("heroSrcPath");
+    const previewBox = document.getElementById("heroPreviewBox");
+    const previewImg = document.getElementById("heroPreviewImg");
+
+    const isPhoto = !!siteImages.hero.usePhoto;
+    document.querySelector(`input[name="heroMode"][value="${isPhoto ? "photo" : "illustration"}"]`).checked = true;
+    photoFields.hidden = !isPhoto;
+    pathInput.value = siteImages.hero.src || "";
+
+    const existingSrc = await resolveDisplaySrc({ id: "hero", src: siteImages.hero.src }, "src");
+    if (existingSrc) {
+      previewImg.src = existingSrc;
+      previewBox.hidden = false;
+    }
+
+    radios.forEach((r) =>
+      r.addEventListener("change", () => {
+        siteImages.hero.usePhoto = r.value === "photo";
+        photoFields.hidden = r.value !== "photo";
+        saveSiteImagesDraft();
+      })
+    );
+
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      const path = "assets/img/backgrounds/" + slugify(file.name);
+      pathInput.value = path;
+      siteImages.hero.src = path;
+      await saveBlob("hero:src", file);
+      blobUrlCache.delete("hero:src");
+      const url = URL.createObjectURL(file);
+      blobUrlCache.set("hero:src", url);
+      previewImg.src = url;
+      previewBox.hidden = false;
+      saveSiteImagesDraft();
+      showToast("Foto del hero lista — recuerda descargar site-images.js");
+    });
+
+    pathInput.addEventListener("input", () => {
+      siteImages.hero.src = pathInput.value.trim();
+      saveSiteImagesDraft();
+    });
+  }
+
+  async function renderSectionBgList() {
+    const container = document.getElementById("sectionBgList");
+    const blocksHtml = await Promise.all(
+      SECTION_DEFS.map(async (def) => {
+        const conf = siteImages.sectionBackgrounds[def.key] || { enabled: false, src: "", tone: "light", opacity: 85 };
+        const thumb = await resolveDisplaySrc({ id: `secbg-${def.key}`, src: conf.src }, "src");
+        return `
+        <div class="admin-bg-block${conf.enabled ? " enabled" : ""}" data-sec="${def.key}">
+          <div class="admin-bg-head">
+            <label><input type="checkbox" class="bg-enable" ${conf.enabled ? "checked" : ""}> ${def.label}</label>
+          </div>
+          <div class="admin-bg-fields">
+            <div class="field">
+              <label>Foto de fondo</label>
+              <input type="file" class="bg-file" accept="image/*">
+              <input type="text" class="bg-path" style="margin-top:8px" placeholder="assets/img/backgrounds/${def.key}.jpg" value="${escapeHtml(conf.src)}">
+            </div>
+            <div class="field">
+              <label>Velo e intensidad</label>
+              <div class="admin-tone-row">
+                <label><input type="radio" name="tone-${def.key}" class="bg-tone" value="light" ${conf.tone !== "dark" ? "checked" : ""}> Claro</label>
+                <label><input type="radio" name="tone-${def.key}" class="bg-tone" value="dark" ${conf.tone === "dark" ? "checked" : ""}> Oscuro</label>
+              </div>
+              <div class="admin-range-row" style="margin-top:8px">
+                <input type="range" class="bg-opacity" min="0" max="100" value="${conf.opacity ?? 85}">
+                <span class="range-val">${conf.opacity ?? 85}%</span>
+              </div>
+            </div>
+            <img class="admin-bg-thumb bg-thumb" src="${thumb || ""}" alt="">
+          </div>
+        </div>`;
+      })
+    );
+    container.innerHTML = blocksHtml.join("");
+  }
+
+  function initSectionBackgrounds() {
+    const container = document.getElementById("sectionBgList");
+    container.addEventListener("input", async (e) => {
+      const block = e.target.closest(".admin-bg-block");
+      if (!block) return;
+      const key = block.dataset.sec;
+      if (!siteImages.sectionBackgrounds[key]) {
+        siteImages.sectionBackgrounds[key] = { enabled: false, src: "", tone: "light", opacity: 85 };
+      }
+      const conf = siteImages.sectionBackgrounds[key];
+
+      if (e.target.classList.contains("bg-enable")) {
+        conf.enabled = e.target.checked;
+        block.classList.toggle("enabled", conf.enabled);
+      } else if (e.target.classList.contains("bg-file")) {
+        const file = e.target.files[0];
+        if (file) {
+          const path = "assets/img/backgrounds/" + slugify(file.name);
+          conf.src = path;
+          block.querySelector(".bg-path").value = path;
+          await saveBlob(`secbg-${key}:src`, file);
+          blobUrlCache.delete(`secbg-${key}:src`);
+          const url = URL.createObjectURL(file);
+          blobUrlCache.set(`secbg-${key}:src`, url);
+          block.querySelector(".bg-thumb").src = url;
+        }
+      } else if (e.target.classList.contains("bg-path")) {
+        conf.src = e.target.value.trim();
+      } else if (e.target.classList.contains("bg-tone")) {
+        conf.tone = e.target.value;
+      } else if (e.target.classList.contains("bg-opacity")) {
+        conf.opacity = Number(e.target.value);
+        block.querySelector(".range-val").textContent = conf.opacity + "%";
+      }
+      saveSiteImagesDraft();
+    });
+  }
+
+  function buildSiteImagesExportSource() {
+    const hero = siteImages.hero;
+    const bg = siteImages.sectionBackgrounds;
+    const bgLines = Object.keys(bg)
+      .map((key) => {
+        const c = bg[key];
+        return `    ${key}: { enabled: ${JSON.stringify(!!c.enabled)}, src: ${JSON.stringify(c.src || "")}, tone: ${JSON.stringify(c.tone || "light")}, opacity: ${JSON.stringify(c.opacity ?? 85)} },`;
+      })
+      .join("\n");
+    return `/* Generado por el Panel administrador — assets/js/site-images.js */\n\nconst SITE_IMAGES = {\n  hero: { usePhoto: ${JSON.stringify(!!hero.usePhoto)}, src: ${JSON.stringify(hero.src || "")} },\n  sectionBackgrounds: {\n${bgLines}\n  },\n};\n`;
+  }
+
+  function initDownloadImages() {
+    document.getElementById("downloadImagesBtn").addEventListener("click", () => {
+      const blob = new Blob([buildSiteImagesExportSource()], { type: "text/javascript" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "site-images.js";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast("Archivo descargado — sigue las instrucciones para publicarlo");
+    });
+  }
+
+  /* ---------------------------------------------------------------------
      Init
      --------------------------------------------------------------------- */
-  function initApp() {
+  async function initApp() {
     items = loadInitialState();
     initForm();
     initDownload();
     initResetDraft();
     renderManageList();
     renderPreview();
+
+    initTabs();
+    siteImages = loadSiteImagesState();
+    await initHeroForm();
+    await renderSectionBgList();
+    initSectionBackgrounds();
+    initDownloadImages();
   }
 
   document.addEventListener("DOMContentLoaded", initGate);

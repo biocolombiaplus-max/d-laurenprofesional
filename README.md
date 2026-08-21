@@ -12,9 +12,11 @@ assets/css/admin.css       → estilos propios del panel administrador
 assets/js/data.js          → CONFIGURACIÓN EDITABLE (WhatsApp, Nequi, Wompi, productos, precios, reseñas, FAQ)
 assets/js/gallery-data.js  → contenido EDITABLE de la galería "Resultados" (fotos y videos)
 assets/js/gallery-render.js→ lógica compartida para dibujar la galería (sitio público y panel admin)
+assets/js/site-images.js   → contenido EDITABLE: foto del hero y fondos de sección
 assets/js/main.js          → lógica del sitio (carrito, formularios, carrusel, countdown, lightbox, etc.)
 assets/js/admin.js         → lógica del panel administrador
 assets/img/                → imágenes de producto (SVG editables) y assets/img/gallery/ para fotos reales
+assets/img/backgrounds/    → carpeta para la foto del hero y los fondos de sección
 assets/video/               → carpeta para tus videos reales del proceso
 ```
 
@@ -38,19 +40,19 @@ No se usaron fotos del sitio del fabricante porque el acceso a ese dominio no es
 
 ## Panel administrador (`/admin.html`)
 
-Para que puedas agregar fotos y videos de resultados sin tocar código, el sitio incluye un panel visual en **`admin.html`**:
+Para que puedas agregar fotos y videos, cambiar la foto del hero y activar fondos de sección sin tocar código, el sitio incluye un panel visual en **`admin.html`**. Si ya publicaste el sitio (por ejemplo en Vercel), entras agregando `/admin.html` al final de tu dominio: `https://tu-sitio.vercel.app/admin.html`.
 
-1. Ábrelo en tu navegador y entra con el código de acceso (de fábrica: `dlaurent2024`, cámbialo en `assets/js/admin.js` → `ADMIN_PASSCODE`).
-2. Agrega una foto o video: sube el archivo, escribe la descripción y elige la categoría (Antes/Después, Cabello tinturado, Video del proceso, Resultado).
-3. Ordena los elementos con las flechas ↑ ↓, edítalos o elimínalos, y mira la **vista previa** de cómo se verán exactamente en tu landing.
-4. Cuando estés conforme, haz clic en **"⬇ Descargar gallery-data.js"**.
+1. Entra con el código de acceso (de fábrica: `dlaurent2024`, cámbialo en `assets/js/admin.js` → `ADMIN_PASSCODE`).
+2. El panel tiene **dos pestañas**:
+   - **📸 Fotos y videos (Resultados)**: sube el archivo, escribe la descripción y elige la categoría (Antes/Después, Cabello tinturado, Video del proceso, Resultado), ordena con las flechas ↑ ↓, y mira la vista previa. Botón de publicación: **"⬇ Descargar gallery-data.js"**.
+   - **🖼️ Imagen del hero y fondos**: reemplaza la ilustración del hero por una foto real, y/o activa una foto de fondo en cualquier sección (Beneficios, Resultados, Productos, Testimonios, Capacitación/Distribuidores, Preguntas frecuentes) — útil sobre todo en las secciones blancas para que se vean más ricas. Cada fondo lleva un **velo** (claro u oscuro, con intensidad ajustable) para que el texto se siga leyendo bien encima de la foto. Botón de publicación: **"⬇ Descargar site-images.js"**.
 
 **Importante — cómo funciona (y sus límites):** este es un sitio 100% estático, sin servidor ni base de datos. El panel guarda tu progreso como borrador en el navegador (localStorage/IndexedDB) para que no lo pierdas entre visitas, pero **eso solo lo ves tú, en ese navegador** — no se publica automáticamente para tus visitantes. Para publicar de verdad:
-1. Sube tus fotos/videos originales a `assets/img/gallery/` (fotos) o `assets/video/` (videos) de tu proyecto, con el mismo nombre de archivo que se ve en cada tarjeta del panel.
-2. Reemplaza `assets/js/gallery-data.js` por el archivo que descargaste del panel.
-3. Sube los cambios a tu hosting (o haz commit y push si usas GitHub) para que se vean en el sitio real.
+1. Sube tus fotos/videos originales a `assets/img/gallery/` o `assets/video/` (pestaña de galería) o a `assets/img/backgrounds/` (pestaña de hero/fondos) de tu proyecto, con el mismo nombre de archivo que se ve en cada tarjeta del panel.
+2. Descarga el archivo actualizado de la pestaña donde trabajaste (`gallery-data.js` o `site-images.js`) y reemplaza el archivo correspondiente dentro de `assets/js/` en tu proyecto.
+3. Sube los cambios a tu hosting (o haz commit y push si usas GitHub/Vercel) para que se vean en el sitio real — en Vercel, un push a la rama conectada vuelve a desplegar automáticamente.
 
-Si en el futuro quieres que la galería se actualice sin este paso manual (por ejemplo, para que varias personas puedan subir fotos desde el celular sin tocar el código), se necesitaría agregar un backend o un servicio de CMS — este panel es la solución más simple sin esos costos adicionales.
+Si en el futuro quieres que estos cambios se publiquen sin este paso manual (por ejemplo, para que varias personas puedan subir fotos desde el celular sin tocar el código), se necesitaría agregar un backend o un servicio de CMS — este panel es la solución más simple sin esos costos adicionales.
 
 ## Captura de leads (Capacitación / Distribuidores)
 

@@ -11,6 +11,32 @@
   const waLink = (msg) => `${waBase}?text=${encodeURIComponent(msg)}`;
 
   /* ---------------------------------------------------------------------
+     Site images: hero photo swap + per-section background photos
+     (configured from /admin.html → assets/js/site-images.js)
+     --------------------------------------------------------------------- */
+  function applySiteImages() {
+    if (typeof SITE_IMAGES === "undefined") return;
+
+    if (SITE_IMAGES.hero && SITE_IMAGES.hero.usePhoto && SITE_IMAGES.hero.src) {
+      const heroImg = document.getElementById("heroKitImg");
+      if (heroImg) heroImg.src = SITE_IMAGES.hero.src;
+    }
+
+    const bg = SITE_IMAGES.sectionBackgrounds || {};
+    Object.keys(bg).forEach((key) => {
+      const conf = bg[key];
+      const el = document.getElementById(key);
+      if (!el || !conf || !conf.enabled || !conf.src) return;
+      const overlayRGB = conf.tone === "dark" ? "21,12,38" : "248,244,236";
+      const alpha = Math.max(0, Math.min(100, conf.opacity ?? 85)) / 100;
+      el.style.backgroundImage = `linear-gradient(rgba(${overlayRGB},${alpha}), rgba(${overlayRGB},${alpha})), url("${conf.src}")`;
+      el.style.backgroundSize = "cover";
+      el.style.backgroundPosition = "center";
+      el.style.backgroundRepeat = "no-repeat";
+    });
+  }
+
+  /* ---------------------------------------------------------------------
      WhatsApp links across the page
      --------------------------------------------------------------------- */
   function wireWhatsappLinks() {
@@ -483,6 +509,7 @@
      --------------------------------------------------------------------- */
   document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("year").textContent = new Date().getFullYear();
+    applySiteImages();
     wireWhatsappLinks();
     startCountdown();
     initReveal();

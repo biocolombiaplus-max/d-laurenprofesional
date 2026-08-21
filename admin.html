@@ -43,21 +43,27 @@
       <span class="logo-mark" style="border-color:var(--purple-800);color:var(--purple-800)">L</span>
       <span class="logo-text">
         <span class="l1" style="color:var(--purple-950)">D'LAURENT</span><br>
-        <span class="l2">PANEL ADMINISTRADOR · GALERÍA</span>
+        <span class="l2">PANEL ADMINISTRADOR</span>
       </span>
     </div>
     <div class="admin-header-actions">
       <a href="index.html" target="_blank" class="btn btn-outline btn-sm" style="color:var(--purple-800);border-color:var(--purple-800)">Ver landing ↗</a>
-      <button class="btn btn-dark btn-sm" id="downloadBtn">⬇ Descargar gallery-data.js</button>
+      <button class="btn btn-dark btn-sm admin-tab-only" data-tab-btn="gallery" id="downloadBtn">⬇ Descargar gallery-data.js</button>
+      <button class="btn btn-dark btn-sm admin-tab-only" data-tab-btn="images" id="downloadImagesBtn" hidden>⬇ Descargar site-images.js</button>
     </div>
   </header>
 
   <div class="admin-banner">
     ℹ️ Los cambios se guardan automáticamente como borrador <strong>en este navegador</strong>. Para que se vean en tu sitio real,
-    debes descargar el archivo actualizado y subirlo a tu hosting junto con las fotos/videos. Ver instrucciones al final de esta página.
+    debes descargar el archivo actualizado y subirlo a tu hosting junto con las fotos/videos. Ver instrucciones al final de cada pestaña.
   </div>
 
-  <main class="admin-grid">
+  <nav class="admin-tabs">
+    <button class="admin-tab active" data-tab="gallery">📸 Fotos y videos (Resultados)</button>
+    <button class="admin-tab" data-tab="images">🖼️ Imagen del hero y fondos</button>
+  </nav>
+
+  <main class="admin-grid" id="tabGallery">
     <!-- ---------- FORM: add item ---------- -->
     <section class="admin-card">
       <h2>Agregar foto o video</h2>
@@ -140,6 +146,51 @@
       <p class="admin-hint">¿No sabes subir archivos a tu repositorio? Envíale las fotos/videos y este mismo mensaje a quien te ayudó a construir la página, o pide soporte técnico.</p>
     </section>
   </main>
+
+  <!-- ============ TAB: HERO IMAGE + SECTION BACKGROUNDS ============ -->
+  <main class="admin-grid" id="tabImages" hidden>
+    <section class="admin-card admin-card-wide">
+      <h2>Foto principal del Hero</h2>
+      <p class="admin-hint">Es la imagen grande de la primera sección de tu landing (donde ahora se ven los 3 frascos ilustrados). Puedes dejar la ilustración de marca o reemplazarla por una foto real de tus productos o de un resultado.</p>
+
+      <div class="admin-field-row" style="margin-top:16px">
+        <label class="admin-radio"><input type="radio" name="heroMode" value="illustration" checked> 🎨 Usar ilustración de marca</label>
+        <label class="admin-radio"><input type="radio" name="heroMode" value="photo"> 📷 Usar mi propia foto</label>
+      </div>
+
+      <div id="heroPhotoFields" hidden>
+        <div class="field">
+          <label>Foto del hero</label>
+          <input type="file" id="heroFile" accept="image/*">
+          <p class="admin-hint">Formato horizontal, ideal 4:3 o cuadrado. Que se vea bien sobre fondo morado oscuro.</p>
+        </div>
+        <div class="field">
+          <label>Ruta del archivo (se autocompleta al elegir el archivo)</label>
+          <input type="text" id="heroSrcPath" placeholder="assets/img/backgrounds/mi-foto-hero.jpg">
+          <p class="admin-hint">Sube tu archivo real a <code>assets/img/backgrounds/</code> con este mismo nombre.</p>
+        </div>
+        <div class="admin-preview-box" id="heroPreviewBox" style="max-width:280px" hidden>
+          <img id="heroPreviewImg" alt="Vista previa del hero">
+        </div>
+      </div>
+    </section>
+
+    <section class="admin-card admin-card-wide">
+      <h2>Fondos de sección</h2>
+      <p class="admin-hint">Activa una foto de fondo en cualquier sección de la landing — especialmente útil en las secciones blancas para que se vean más ricas visualmente. Se aplica un velo (claro u oscuro) sobre la foto para que el texto se siga leyendo bien.</p>
+      <div id="sectionBgList" style="margin-top:18px"></div>
+    </section>
+
+    <!-- ---------- PUBLISH INSTRUCTIONS (images) ---------- -->
+    <section class="admin-card admin-card-wide admin-instructions">
+      <h2>Cómo publicar estos cambios</h2>
+      <ol>
+        <li>Sube tus fotos originales a la carpeta <code>assets/img/backgrounds/</code> de tu proyecto, <strong>con exactamente el mismo nombre de archivo</strong> que se muestra arriba.</li>
+        <li>Haz clic en <strong>"⬇ Descargar site-images.js"</strong> (arriba a la derecha) y reemplaza el archivo <code>assets/js/site-images.js</code> de tu proyecto por el que acabas de descargar.</li>
+        <li>Sube los cambios a tu hosting (o haz commit y push si usas GitHub / Vercel) para que todos los visitantes vean el hero y los fondos actualizados.</li>
+      </ol>
+    </section>
+  </main>
 </div>
 
 <div class="toast" id="toast">
@@ -149,6 +200,7 @@
 
 <script src="assets/js/gallery-data.js"></script>
 <script src="assets/js/gallery-render.js"></script>
+<script src="assets/js/site-images.js"></script>
 <script src="assets/js/admin.js"></script>
 </body>
 </html>
