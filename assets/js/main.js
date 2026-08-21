@@ -93,6 +93,10 @@
       const el = document.getElementById(id);
       if (el) el.href = waLink(genericMsg);
     });
+    const topbarLink = document.getElementById("topbarLink");
+    if (topbarLink) {
+      topbarLink.href = waLink("Hola D'Laurent Professional 👋, vi el precio de lanzamiento en la página y quiero aprovecharlo.");
+    }
   }
 
   /* ---------------------------------------------------------------------
