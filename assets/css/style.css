@@ -231,6 +231,14 @@ header.site-header {
 
 .hero-visual { position: relative; display: flex; justify-content: center; align-items: center; }
 .hero-kit-img { width: 100%; max-width: 620px; filter: drop-shadow(0 30px 40px rgba(0,0,0,.35)); }
+.hero-kit-img.is-photo {
+  max-width: 480px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(201,169,97,.45);
+  box-shadow: 0 30px 70px rgba(0,0,0,.5);
+  filter: none;
+}
+.hero-visual--photo .floating-chip { display: none; }
 .floating-chip {
   position: absolute; background: var(--white); color: var(--purple-950);
   border-radius: var(--radius-md); padding: 14px 18px; box-shadow: var(--shadow-soft);

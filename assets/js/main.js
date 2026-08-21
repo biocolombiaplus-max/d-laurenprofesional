@@ -55,7 +55,14 @@
 
     if (SITE_IMAGES.hero && SITE_IMAGES.hero.usePhoto && SITE_IMAGES.hero.src) {
       const heroImg = document.getElementById("heroKitImg");
-      if (heroImg) heroImg.src = SITE_IMAGES.hero.src;
+      const heroVisual = document.querySelector(".hero-visual");
+      if (heroImg) {
+        heroImg.src = SITE_IMAGES.hero.src;
+        heroImg.classList.add("is-photo");
+      }
+      // La foto propia trae su propio diseño (marco, insignias, etc.):
+      // ocultamos las insignias flotantes de la plantilla para no duplicar texto.
+      if (heroVisual) heroVisual.classList.add("hero-visual--photo");
     }
 
     const bg = SITE_IMAGES.sectionBackgrounds || {};
