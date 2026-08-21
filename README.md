@@ -18,6 +18,7 @@ assets/js/admin.js         → lógica del panel administrador
 assets/img/                → imágenes de producto (SVG editables) y assets/img/gallery/ para fotos reales
 assets/img/backgrounds/    → carpeta para la foto del hero y los fondos de sección
 assets/video/               → carpeta para tus videos reales del proceso
+assets/docs/                → instructivo técnico de aplicación en PDF (descargable desde la sección de Capacitación)
 ```
 
 ## Qué editar primero (`assets/js/data.js`)
