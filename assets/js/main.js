@@ -54,20 +54,44 @@
     if (typeof SITE_IMAGES === "undefined") return;
 
     if (SITE_IMAGES.hero) {
-      const heroImg = document.getElementById("heroKitImg");
+      let heroImg = document.getElementById("heroKitImg");
       const sizePct = SITE_IMAGES.hero.sizePct || 100;
-      if (heroImg) heroImg.style.maxWidth = Math.round(6.2 * sizePct) + "px";
+      const maxWidthPx = Math.round(6.2 * sizePct) + "px";
 
-      if (SITE_IMAGES.hero.usePhoto && SITE_IMAGES.hero.src) {
+      if (SITE_IMAGES.hero.usePhoto && SITE_IMAGES.hero.src && heroImg) {
         const heroVisual = document.querySelector(".hero-visual");
-        if (heroImg) {
-          heroImg.src = SITE_IMAGES.hero.src;
-          heroImg.classList.add("is-photo");
+        const isVideo = SITE_IMAGES.hero.mediaType === "video";
+        const wantsVideoTag = isVideo && heroImg.tagName !== "VIDEO";
+        const wantsImgTag = !isVideo && heroImg.tagName === "VIDEO";
+
+        if (wantsVideoTag) {
+          const video = document.createElement("video");
+          video.id = heroImg.id;
+          video.className = heroImg.className;
+          video.muted = true;
+          video.autoplay = true;
+          video.loop = true;
+          video.setAttribute("playsinline", "");
+          heroImg.replaceWith(video);
+          heroImg = video;
+        } else if (wantsImgTag) {
+          const img = document.createElement("img");
+          img.id = heroImg.id;
+          img.className = heroImg.className;
+          img.alt = "Alisado profesional D'Laurent Professional";
+          heroImg.replaceWith(img);
+          heroImg = img;
         }
-        // La foto propia trae su propio diseño (marco, insignias, etc.):
+
+        heroImg.src = SITE_IMAGES.hero.src;
+        heroImg.classList.add("is-photo");
+        if (isVideo) heroImg.play?.().catch(() => {});
+        // La foto/video propio trae su propio diseño (marco, insignias, etc.):
         // ocultamos las insignias flotantes de la plantilla para no duplicar texto.
         if (heroVisual) heroVisual.classList.add("hero-visual--photo");
       }
+
+      if (heroImg) heroImg.style.maxWidth = maxWidthPx;
     }
 
     const bg = SITE_IMAGES.sectionBackgrounds || {};

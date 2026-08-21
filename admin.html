@@ -156,12 +156,14 @@
 
       <div id="heroPhotoFields" hidden>
         <div class="field">
-          <label>Foto del hero</label>
-          <input type="file" id="heroFile" accept="image/*">
-          <p class="admin-hint">Formato horizontal, ideal 4:3 o cuadrado. Que se vea bien sobre fondo morado oscuro. Se publica al instante al seleccionarla.</p>
+          <label>Foto o video corto del hero</label>
+          <input type="file" id="heroFile" accept="image/*,video/*">
+          <p class="admin-hint">Foto: horizontal, ideal 4:3 o cuadrada. Video: corto (5–10 segundos), sin audio necesario (se reproduce muteado en bucle), <strong>máximo recomendado 15 MB</strong> para que la página no cargue lenta. Se publica al instante al seleccionarlo.</p>
+          <p class="admin-hint" id="heroFileWarning" style="color:var(--danger);font-weight:700" hidden></p>
         </div>
         <div class="admin-preview-box" id="heroPreviewBox" style="max-width:280px" hidden>
-          <img id="heroPreviewImg" alt="Vista previa del hero">
+          <img id="heroPreviewImg" alt="Vista previa del hero" hidden>
+          <video id="heroPreviewVideo" muted loop autoplay playsinline hidden></video>
         </div>
       </div>
 

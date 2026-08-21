@@ -6,7 +6,8 @@
    mismo archivo de forma visual. Ver README.md → "Panel administrador".
 
    - hero.usePhoto: true para reemplazar la ilustración del hero por una
-     foto real (hero.src). false = usar la ilustración de marca.
+     foto o video real (hero.src). false = usar la ilustración de marca.
+   - hero.mediaType: "image" o "video" — se detecta solo al subir el archivo.
    - sectionBackgrounds.<seccion>.enabled: true para mostrar una foto de
      fondo detrás del contenido de esa sección.
    - src: ruta del archivo en assets/img/backgrounds/.
@@ -20,6 +21,7 @@ const SITE_IMAGES = {
   hero: {
     usePhoto: false,
     src: "",
+    mediaType: "image",
     sizePct: 100,
   },
   sectionBackgrounds: {

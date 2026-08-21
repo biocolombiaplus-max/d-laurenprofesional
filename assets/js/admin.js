@@ -361,6 +361,8 @@
     const fileInput = document.getElementById("heroFile");
     const previewBox = document.getElementById("heroPreviewBox");
     const previewImg = document.getElementById("heroPreviewImg");
+    const previewVideo = document.getElementById("heroPreviewVideo");
+    const fileWarning = document.getElementById("heroFileWarning");
     const sizeRange = document.getElementById("heroSizeRange");
     const sizeVal = document.getElementById("heroSizeVal");
 
@@ -368,9 +370,21 @@
     document.querySelector(`input[name="heroMode"][value="${isPhoto ? "photo" : "illustration"}"]`).checked = true;
     photoFields.hidden = !isPhoto;
 
-    if (siteImages.hero.src) {
-      previewImg.src = siteImages.hero.src;
+    function showPreview(url, mediaType) {
+      if (mediaType === "video") {
+        previewVideo.src = url;
+        previewVideo.hidden = false;
+        previewImg.hidden = true;
+      } else {
+        previewImg.src = url;
+        previewImg.hidden = false;
+        previewVideo.hidden = true;
+      }
       previewBox.hidden = false;
+    }
+
+    if (siteImages.hero.src) {
+      showPreview(siteImages.hero.src, siteImages.hero.mediaType);
     }
 
     sizeRange.value = siteImages.hero.sizePct || 100;
@@ -392,17 +406,24 @@
     fileInput.addEventListener("change", async () => {
       const file = fileInput.files[0];
       if (!file) return;
-      showToast("Subiendo foto del hero…");
+      const mediaType = file.type.startsWith("video/") ? "video" : "image";
+      const MAX_VIDEO_MB = 15;
+      fileWarning.hidden = true;
+      if (mediaType === "video" && file.size > MAX_VIDEO_MB * 1024 * 1024) {
+        fileWarning.textContent = `⚠ Este video pesa ${(file.size / 1024 / 1024).toFixed(1)} MB — más de ${MAX_VIDEO_MB} MB puede hacer que tu página cargue lenta. Se subirá igual, pero considera comprimirlo.`;
+        fileWarning.hidden = false;
+      }
+      showToast(mediaType === "video" ? "Subiendo video…" : "Subiendo foto del hero…");
       try {
         const url = await uploadFile("backgrounds", file);
         siteImages.hero.src = url;
-        previewImg.src = url;
-        previewBox.hidden = false;
+        siteImages.hero.mediaType = mediaType;
+        showPreview(url, mediaType);
         scheduleSaveSiteImages();
-        showToast("Foto del hero publicada ✓");
+        showToast(mediaType === "video" ? "Video publicado ✓" : "Foto del hero publicada ✓");
       } catch (e) {
         console.error(e);
-        showToast("No se pudo subir la foto. Inténtalo de nuevo.");
+        showToast("No se pudo subir el archivo. Inténtalo de nuevo.");
       }
     });
   }
