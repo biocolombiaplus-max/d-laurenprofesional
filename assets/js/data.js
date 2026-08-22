@@ -8,7 +8,11 @@
    - Precios: cambia el campo "price" de cada producto (número, sin puntos).
      Mientras no definas precios, deja "price: null" y el sitio mostrará
      "Precio de lanzamiento — consulta por WhatsApp".
-   - Link de Wompi: pega la URL que te entregue Wompi en WOMPI_PAYMENT_LINK.
+   - Wompi: ya está conectada tu llave pública. Si más adelante Wompi te entrega
+     un "Secreto de integridad" (panel Wompi > Desarrolladores), puedes pegarlo
+     en wompiIntegritySecret para blindar el monto del pago. Nunca pegues aquí
+     tu llave PRIVADA: este sitio no tiene backend, así que cualquier dato en
+     estos archivos es visible públicamente — la llave privada no debe usarse.
    - Reseñas: agrega, edita o elimina objetos dentro de REVIEWS.
    - Fotos/videos reales: reemplaza los archivos en /assets/img/ y
      /assets/video/ manteniendo los mismos nombres, o actualiza las rutas
@@ -22,7 +26,9 @@ const SITE_CONFIG = {
   whatsappDisplay: "+57 350 545 7420",
   nequiNumber: "3505457420",
   nequiHolder: "Juan Cáceres",
-  wompiPaymentLink: "", // TODO: pega aquí el link de pago de Wompi cuando lo tengas
+  nequiDiscountPct: 5, // % de descuento al pagar con Nequi vía Wompi
+  wompiPublicKey: "pub_prod_ePakM1CIHRH6Cg2Y7XacjvTxmLeJsEG2", // llave PÚBLICA de Wompi (segura para el navegador)
+  wompiIntegritySecret: "", // opcional: "Secreto de integridad" de tu panel Wompi (Desarrolladores > Secreto de integridad). NUNCA pegues aquí la llave privada.
   instagram: "#",
   tiktok: "#",
   facebook: "#",
@@ -30,6 +36,10 @@ const SITE_CONFIG = {
   city: "Colombia",
 };
 
+/* PRODUCTS: contenido de respaldo. Ahora puedes agregar, editar, eliminar y
+   poner precios a tus productos de forma visual desde la pestaña "Productos"
+   del panel administrador (/admin.html) — esta lista solo se usa si aún no
+   has publicado nada desde allí, o como respaldo si la conexión falla. */
 const PRODUCTS = [
   {
     id: "kit-120",

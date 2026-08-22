@@ -19,12 +19,13 @@
   async function loadLiveContent() {
     if (typeof supabaseClient === "undefined" || !supabaseClient) return;
     try {
-      const { data, error } = await supabaseClient.from("site_content").select("key,data").in("key", ["gallery", "images", "benefits"]);
+      const { data, error } = await supabaseClient.from("site_content").select("key,data").in("key", ["gallery", "images", "benefits", "products"]);
       if (error) throw error;
 
       const galleryRow = (data || []).find((r) => r.key === "gallery");
       const imagesRow = (data || []).find((r) => r.key === "images");
       const benefitsRow = (data || []).find((r) => r.key === "benefits");
+      const productsRow = (data || []).find((r) => r.key === "products");
 
       if (galleryRow && Array.isArray(galleryRow.data.items)) {
         GALLERY.length = 0;
@@ -45,6 +46,10 @@
       if (benefitsRow && Array.isArray(benefitsRow.data.items) && typeof BENEFITS !== "undefined") {
         BENEFITS.length = 0;
         BENEFITS.push(...benefitsRow.data.items);
+      }
+      if (productsRow && Array.isArray(productsRow.data.items) && typeof PRODUCTS !== "undefined") {
+        PRODUCTS.length = 0;
+        PRODUCTS.push(...productsRow.data.items);
       }
     } catch (err) {
       console.warn("No se pudo cargar el contenido en vivo desde Supabase, usando el contenido local.", err);
@@ -250,7 +255,7 @@
           <h3>${p.name}</h3>
           <p class="tagline">${p.tagline}</p>
           <ul class="product-bullets">
-            ${p.bullets.map((b) => `<li>${b}</li>`).join("")}
+            ${(p.bullets || []).map((b) => `<li>${b}</li>`).join("")}
           </ul>
           <div class="product-footer">
             <div class="product-price">
@@ -396,9 +401,32 @@
   }
 
   /* ---------------------------------------------------------------------
-     Payment modal
+     Payment modal — Wompi Web Checkout (redirect, usa solo la llave PÚBLICA)
      --------------------------------------------------------------------- */
+  async function buildWompiCheckoutUrl(amountCOP, refSuffix) {
+    const reference = `dlaurent-${Date.now()}-${refSuffix}`;
+    const amountInCents = Math.round(amountCOP * 100);
+    const redirectUrl = window.location.origin + window.location.pathname;
+    const params = new URLSearchParams({
+      "public-key": SITE_CONFIG.wompiPublicKey,
+      "currency": "COP",
+      "amount-in-cents": String(amountInCents),
+      "reference": reference,
+      "redirect-url": redirectUrl,
+    });
+
+    if (SITE_CONFIG.wompiIntegritySecret) {
+      const message = `${reference}${amountInCents}COP${SITE_CONFIG.wompiIntegritySecret}`;
+      const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(message));
+      const hashHex = Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, "0")).join("");
+      params.set("signature:integrity", hashHex);
+    }
+
+    return `https://checkout.wompi.co/p/?${params.toString()}`;
+  }
+
   function openPayModal() {
+    updatePayModalAmounts();
     document.getElementById("payModal").classList.add("show");
     document.getElementById("overlay").classList.add("show");
   }
@@ -406,21 +434,45 @@
     document.getElementById("payModal").classList.remove("show");
   }
 
+  function updatePayModalAmounts() {
+    const total = cartTotal();
+    const pct = SITE_CONFIG.nequiDiscountPct || 0;
+    const badge = document.getElementById("nequiDiscountBadge");
+    const wompiText = document.getElementById("wompiText");
+    if (badge) badge.textContent = pct ? `${pct}% de descuento` : "Rápido y seguro";
+    if (wompiText && total > 0) {
+      wompiText.textContent = `Total a pagar: ${fmtCOP(total)} — débito, crédito, PSE y más`;
+    }
+  }
+
   function initPayModal() {
     document.getElementById("payModalClose").addEventListener("click", closePayModal);
     document.getElementById("nequiNumberText").textContent = SITE_CONFIG.nequiNumber.replace(/(\d{3})(\d{3})(\d{4})/, "$1 $2 $3");
 
-    const wompiLink = document.getElementById("wompiLink");
-    const wompiText = document.getElementById("wompiText");
-    if (SITE_CONFIG.wompiPaymentLink) {
-      wompiLink.href = SITE_CONFIG.wompiPaymentLink;
-      wompiText.textContent = "Paga de forma segura en línea con tarjeta, PSE o billetera digital.";
-    } else {
-      wompiLink.href = waLink("Hola D'Laurent Professional 👋, quiero pagar mi pedido con Wompi.");
-    }
-
     document.getElementById("copyNequi").addEventListener("click", () => {
       navigator.clipboard?.writeText(SITE_CONFIG.nequiNumber).then(() => showToast("Número Nequi copiado"));
+    });
+
+    const hasWompiKey = !!SITE_CONFIG.wompiPublicKey;
+
+    async function goToWompi(discountPct, refSuffix) {
+      const total = cartTotal();
+      if (!hasWompiKey || total <= 0) {
+        window.open(waLink(buildOrderMessage()), "_blank", "noopener");
+        return;
+      }
+      const amount = Math.round(total * (1 - discountPct / 100));
+      const url = await buildWompiCheckoutUrl(amount, refSuffix);
+      window.open(url, "_blank", "noopener");
+    }
+
+    document.getElementById("wompiLink").addEventListener("click", (e) => {
+      e.preventDefault();
+      goToWompi(0, "tarjeta");
+    });
+    document.getElementById("nequiWompiBtn").addEventListener("click", (e) => {
+      e.preventDefault();
+      goToWompi(SITE_CONFIG.nequiDiscountPct || 0, "nequi");
     });
   }
 

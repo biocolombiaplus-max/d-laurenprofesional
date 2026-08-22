@@ -79,6 +79,7 @@
     <button class="admin-tab active" data-tab="gallery">📸 Fotos y videos (Resultados)</button>
     <button class="admin-tab" data-tab="images">🖼️ Imagen del hero y fondos</button>
     <button class="admin-tab" data-tab="benefits">🏅 Íconos de beneficios</button>
+    <button class="admin-tab" data-tab="products">🛍️ Productos (Tienda)</button>
   </nav>
 
   <main class="admin-grid" id="tabGallery">
@@ -192,6 +193,76 @@
       <div id="benefitsList" style="margin-top:18px"></div>
     </section>
   </main>
+
+  <!-- ============ TAB: PRODUCTS (STORE) ============ -->
+  <main class="admin-grid" id="tabProducts" hidden>
+    <!-- ---------- FORM: add/edit product ---------- -->
+    <section class="admin-card">
+      <h2 id="prodFormTitle">Agregar producto</h2>
+      <p class="admin-hint">Crea tu tienda como en Shopify: nombre, foto, descripción y precio. Se publica al instante en la sección "Productos" de tu landing.</p>
+
+      <div class="field">
+        <label>Nombre del producto</label>
+        <input type="text" id="prodName" placeholder="Ej: Kit Presentación 250ML">
+      </div>
+
+      <div class="field">
+        <label>Frase corta (tagline)</label>
+        <input type="text" id="prodTagline" placeholder="Ej: El favorito de salones que atienden a diario">
+      </div>
+
+      <div class="admin-field-row">
+        <div class="field" style="flex:1">
+          <label>Tamaño / presentación</label>
+          <input type="text" id="prodSize" placeholder="Ej: 250 ML">
+        </div>
+        <div class="field" style="flex:1">
+          <label>Precio (COP)</label>
+          <input type="number" id="prodPrice" placeholder="Ej: 320000" min="0" step="1000">
+        </div>
+      </div>
+      <p class="admin-hint">Deja el precio vacío para mostrar "Consultar" y remitir al cliente a WhatsApp.</p>
+
+      <div class="field">
+        <label>Insignia (opcional)</label>
+        <input type="text" id="prodBadge" placeholder="Ej: Más vendido">
+      </div>
+
+      <div class="field">
+        <label>Características (una por línea)</label>
+        <textarea id="prodBullets" rows="4" placeholder="Sin amoniaco, sin olor&#10;Fórmula orgánica y biodegradable&#10;Hasta 4-5 servicios completos"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Foto del producto</label>
+        <input type="file" id="prodFile" accept="image/*">
+        <p class="admin-hint">Idealmente en formato vertical, fondo limpio, buena luz — así se ve más profesional.</p>
+      </div>
+
+      <div class="admin-preview-box" id="prodPreviewBox" hidden>
+        <img id="prodPreviewImg" alt="Vista previa del producto">
+      </div>
+
+      <button class="btn btn-gold btn-block" id="addProductBtn" style="margin-top:16px">+ Agregar producto</button>
+      <button class="admin-link-btn" id="cancelEditProduct" hidden style="margin-top:10px">Cancelar edición</button>
+      <p class="admin-hint" id="prodUploadProgress"></p>
+    </section>
+
+    <!-- ---------- MANAGE LIST ---------- -->
+    <section class="admin-card">
+      <div class="admin-card-head">
+        <h2>Productos en tu tienda (<span id="productsCount">0</span>)</h2>
+      </div>
+      <p class="admin-hint">Usa las flechas para ordenar, ✎ para editar y ✕ para eliminar. Este orden es el que verán tus visitantes.</p>
+      <div class="admin-manage-list" id="productsManageList"></div>
+    </section>
+
+    <!-- ---------- LIVE PREVIEW ---------- -->
+    <section class="admin-card admin-card-wide">
+      <h2>Vista previa — así se ve en tu landing</h2>
+      <div class="product-grid" id="productsPreviewGrid" style="margin-top:18px"></div>
+    </section>
+  </main>
 </div>
 
 <div class="toast" id="toast">
@@ -203,6 +274,7 @@
 <script src="assets/js/gallery-render.js"></script>
 <script src="assets/js/site-images.js"></script>
 <script src="assets/js/benefits-data.js"></script>
+<script src="assets/js/data.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="assets/js/supabase-config.js"></script>
 <script src="assets/js/admin.js"></script>

@@ -126,6 +126,7 @@
         document.getElementById("tabGallery").hidden = tab !== "gallery";
         document.getElementById("tabImages").hidden = tab !== "images";
         document.getElementById("tabBenefits").hidden = tab !== "benefits";
+        document.getElementById("tabProducts").hidden = tab !== "products";
       });
     });
   }
@@ -624,6 +625,235 @@
     });
   }
 
+  /* =======================================================================
+     TAB 4 — Products (Tienda, estilo Shopify)
+     ======================================================================= */
+  let products = [];
+  let editingProductIndex = null;
+  let pendingProductImage = "";
+  let saveProductsTimer = null;
+
+  function fmtCOPAdmin(n) {
+    return n == null ? "Consultar" : new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(n);
+  }
+
+  async function loadProductsState() {
+    try {
+      const { data, error } = await supabaseClient.from("site_content").select("data").eq("key", "products").maybeSingle();
+      if (error) throw error;
+      if (data && Array.isArray(data.data.items)) return data.data.items;
+    } catch (e) {
+      console.warn("No se pudo leer los productos desde Supabase, usando el contenido local.", e);
+    }
+    return typeof PRODUCTS !== "undefined" ? JSON.parse(JSON.stringify(PRODUCTS)) : [];
+  }
+
+  async function saveProductsNow() {
+    setSaveStatus("saving");
+    try {
+      const { error } = await supabaseClient.from("site_content").upsert({ key: "products", data: { items: products } });
+      if (error) throw error;
+      setSaveStatus("ok");
+    } catch (e) {
+      console.error(e);
+      setSaveStatus("error");
+      showToast("No se pudo guardar. Revisa tu conexión e inténtalo de nuevo.");
+    }
+  }
+
+  function renderProductsManageList() {
+    const list = document.getElementById("productsManageList");
+    document.getElementById("productsCount").textContent = products.length;
+    if (products.length === 0) {
+      list.innerHTML = `<div class="admin-manage-empty">Aún no has agregado productos. Usa el formulario de la izquierda.</div>`;
+      return;
+    }
+    list.innerHTML = products
+      .map((p, i) => `
+        <div class="admin-manage-item">
+          <img src="${p.image || ""}" alt="">
+          <div class="mi-info">
+            <div class="mi-caption">${escapeHtml(p.name)}</div>
+            <div class="mi-meta">${fmtCOPAdmin(p.price)}${p.size ? " · " + escapeHtml(p.size) : ""}${p.badge ? " · " + escapeHtml(p.badge) : ""}</div>
+          </div>
+          <div class="mi-actions">
+            <button data-up="${i}" title="Subir" ${i === 0 ? "disabled" : ""}>↑</button>
+            <button data-down="${i}" title="Bajar" ${i === products.length - 1 ? "disabled" : ""}>↓</button>
+            <button data-edit="${i}" title="Editar">✎</button>
+            <button data-del="${i}" class="mi-delete" title="Eliminar">✕</button>
+          </div>
+        </div>`)
+      .join("");
+
+    list.querySelectorAll("[data-up]").forEach((b) => b.addEventListener("click", () => moveProduct(Number(b.dataset.up), -1)));
+    list.querySelectorAll("[data-down]").forEach((b) => b.addEventListener("click", () => moveProduct(Number(b.dataset.down), 1)));
+    list.querySelectorAll("[data-edit]").forEach((b) => b.addEventListener("click", () => startEditProduct(Number(b.dataset.edit))));
+    list.querySelectorAll("[data-del]").forEach((b) => b.addEventListener("click", () => deleteProduct(Number(b.dataset.del))));
+  }
+
+  function renderProductsPreview() {
+    const grid = document.getElementById("productsPreviewGrid");
+    if (!grid) return;
+    grid.innerHTML = products
+      .map((p) => `
+        <div class="product-card">
+          <div class="product-media">
+            ${p.badge ? `<span class="product-badge">${escapeHtml(p.badge)}</span>` : ""}
+            <img src="${p.image || ""}" alt="${escapeHtml(p.name)}">
+          </div>
+          <div class="product-body">
+            <h3>${escapeHtml(p.name)}</h3>
+            <p class="tagline">${escapeHtml(p.tagline || "")}</p>
+            <ul class="product-bullets">${(p.bullets || []).map((b) => `<li>${escapeHtml(b)}</li>`).join("")}</ul>
+            <div class="product-footer">
+              <div class="product-price">
+                ${p.price != null ? fmtCOPAdmin(p.price) : "Consultar"}
+                <small>${p.price != null ? "precio de lanzamiento" : "escríbenos por WhatsApp"}</small>
+              </div>
+            </div>
+          </div>
+        </div>`)
+      .join("");
+  }
+
+  function moveProduct(index, dir) {
+    const target = index + dir;
+    if (target < 0 || target >= products.length) return;
+    [products[index], products[target]] = [products[target], products[index]];
+    persistAndRenderProducts();
+  }
+
+  async function deleteProduct(index) {
+    const p = products[index];
+    if (!p) return;
+    if (!confirm(`¿Eliminar "${p.name}" de la tienda? Esto se publica de inmediato.`)) return;
+    products.splice(index, 1);
+    if (editingProductIndex === index) resetProductForm();
+    await persistAndRenderProducts();
+    showToast("Producto eliminado");
+  }
+
+  async function persistAndRenderProducts() {
+    renderProductsManageList();
+    renderProductsPreview();
+    await saveProductsNow();
+  }
+
+  function startEditProduct(index) {
+    const p = products[index];
+    if (!p) return;
+    editingProductIndex = index;
+    pendingProductImage = "";
+    document.getElementById("prodName").value = p.name || "";
+    document.getElementById("prodTagline").value = p.tagline || "";
+    document.getElementById("prodSize").value = p.size || "";
+    document.getElementById("prodPrice").value = p.price != null ? p.price : "";
+    document.getElementById("prodBadge").value = p.badge || "";
+    document.getElementById("prodBullets").value = (p.bullets || []).join("\n");
+    const previewImg = document.getElementById("prodPreviewImg");
+    const previewBox = document.getElementById("prodPreviewBox");
+    if (p.image) {
+      previewImg.src = p.image;
+      previewBox.hidden = false;
+    } else {
+      previewBox.hidden = true;
+    }
+    document.getElementById("prodFormTitle").textContent = "Editar producto";
+    document.getElementById("addProductBtn").textContent = "Actualizar producto";
+    document.getElementById("cancelEditProduct").hidden = false;
+  }
+
+  function resetProductForm() {
+    editingProductIndex = null;
+    pendingProductImage = "";
+    document.getElementById("prodName").value = "";
+    document.getElementById("prodTagline").value = "";
+    document.getElementById("prodSize").value = "";
+    document.getElementById("prodPrice").value = "";
+    document.getElementById("prodBadge").value = "";
+    document.getElementById("prodBullets").value = "";
+    document.getElementById("prodFile").value = "";
+    document.getElementById("prodPreviewBox").hidden = true;
+    document.getElementById("prodFormTitle").textContent = "Agregar producto";
+    document.getElementById("addProductBtn").textContent = "+ Agregar producto";
+    document.getElementById("cancelEditProduct").hidden = true;
+  }
+
+  function initProductsForm() {
+    const fileInput = document.getElementById("prodFile");
+    const previewBox = document.getElementById("prodPreviewBox");
+    const previewImg = document.getElementById("prodPreviewImg");
+    const addBtn = document.getElementById("addProductBtn");
+    const progressEl = document.getElementById("prodUploadProgress");
+
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      previewImg.src = URL.createObjectURL(file);
+      previewBox.hidden = false;
+      progressEl.textContent = "Subiendo foto…";
+      try {
+        pendingProductImage = await uploadFile("backgrounds", file);
+        progressEl.textContent = "Foto lista ✓";
+      } catch (e) {
+        console.error(e);
+        progressEl.textContent = "";
+        showToast("No se pudo subir la foto. Inténtalo de nuevo.");
+      }
+    });
+
+    addBtn.addEventListener("click", async () => {
+      const name = document.getElementById("prodName").value.trim();
+      const tagline = document.getElementById("prodTagline").value.trim();
+      const size = document.getElementById("prodSize").value.trim();
+      const priceRaw = document.getElementById("prodPrice").value.trim();
+      const price = priceRaw === "" ? null : Number(priceRaw);
+      const badge = document.getElementById("prodBadge").value.trim();
+      const bullets = document
+        .getElementById("prodBullets")
+        .value.split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      if (!name) {
+        showToast("Escribe el nombre del producto");
+        return;
+      }
+
+      const existingImage = editingProductIndex != null ? products[editingProductIndex].image : "";
+      const image = pendingProductImage || existingImage || "";
+      if (!image) {
+        showToast("Sube una foto del producto");
+        return;
+      }
+
+      const productData = {
+        id: editingProductIndex != null ? products[editingProductIndex].id : uid(),
+        name,
+        tagline,
+        size,
+        price,
+        badge: badge || "Disponible",
+        image,
+        bullets,
+      };
+
+      addBtn.disabled = true;
+      if (editingProductIndex != null) {
+        products[editingProductIndex] = productData;
+      } else {
+        products.push(productData);
+      }
+
+      await persistAndRenderProducts();
+      showToast(editingProductIndex != null ? "Producto actualizado ✓" : "Producto agregado a la tienda ✓");
+      resetProductForm();
+      addBtn.disabled = false;
+    });
+
+    document.getElementById("cancelEditProduct").addEventListener("click", resetProductForm);
+  }
+
   /* ---------------------------------------------------------------------
      Init
      --------------------------------------------------------------------- */
@@ -644,6 +874,11 @@
     benefits = await loadBenefitsState();
     renderBenefitsList();
     initBenefitsForm();
+
+    products = await loadProductsState();
+    initProductsForm();
+    renderProductsManageList();
+    renderProductsPreview();
 
     setSaveStatus("ok");
   }

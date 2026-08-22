@@ -59,11 +59,17 @@
 .admin-card .field { margin-bottom: 16px; }
 .admin-card .field label { color: var(--purple-950); font-size: 12.5px; font-weight: 700; margin-bottom: 6px; display: block; }
 .admin-card .field input[type="text"],
+.admin-card .field input[type="number"],
 .admin-card .field input[type="file"],
-.admin-card .field select {
+.admin-card .field select,
+.admin-card .field textarea {
   width: 100%; padding: 11px 13px; border-radius: var(--radius-sm); border: 1.5px solid #e3d7ba; font-size: 14px; font-family: inherit; background: #fff; color: var(--ink);
 }
-.admin-card .field input[type="text"]:focus, .admin-card .field select:focus { outline: none; border-color: var(--gold-dark); }
+.admin-card .field textarea { resize: vertical; min-height: 80px; }
+.admin-card .field input[type="text"]:focus,
+.admin-card .field input[type="number"]:focus,
+.admin-card .field select:focus,
+.admin-card .field textarea:focus { outline: none; border-color: var(--gold-dark); }
 .admin-hint { font-size: 12px; color: #a89f78; margin-top: 6px; line-height: 1.5; }
 
 .admin-preview-box { position: relative; border-radius: var(--radius-sm); overflow: hidden; background: #f3ede0; aspect-ratio: 3/4; max-width: 200px; display: flex; align-items: flex-end; }

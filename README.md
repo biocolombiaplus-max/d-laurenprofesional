@@ -24,7 +24,7 @@ assets/docs/                → instructivo técnico de aplicación en PDF (desc
 ## Qué editar primero (`assets/js/data.js`)
 
 1. **Precios**: cambia `price: null` por el valor en pesos (ej. `price: 180000`) en cada producto dentro de `PRODUCTS`. Mientras el precio esté en `null`, el sitio muestra "Consultar" y remite a WhatsApp.
-2. **Link de pago Wompi**: pega tu URL de pago en `wompiPaymentLink` dentro de `SITE_CONFIG`. Mientras esté vacío, el botón de Wompi también remite a WhatsApp.
+2. **Wompi**: ya está conectada la llave pública (`wompiPublicKey`) en `SITE_CONFIG` — los botones de pago abren el Checkout de Wompi automáticamente con el total del carrito. Nunca pegues aquí tu llave PRIVADA (este sitio es 100% estático y no tiene backend, así que cualquier dato en estos archivos queda visible públicamente). Si Wompi te entrega un "Secreto de integridad" (panel Wompi → Desarrolladores), puedes pegarlo en `wompiIntegritySecret` para blindar el monto contra manipulación.
 3. **Nequi**: número y titular ya configurados (`3505457420` / Juan Cáceres). Cámbialos si es necesario.
 4. **WhatsApp**: número ya configurado (`+57 350 545 7420`). Todos los botones de "WhatsApp" del sitio usan este mismo número.
 5. **Fecha de oferta de lanzamiento**: ajusta `launchOfferEndsAt` con la fecha real en que termina tu promoción (el contador de la barra superior se calcula automáticamente).
@@ -73,9 +73,11 @@ Mientras `supabase-config.js` tenga los valores de fábrica (`"TU_SUPABASE_URL"`
 
 ### Uso diario
 
-Una vez conectado, inicias sesión con tu correo/contraseña y el panel tiene **dos pestañas**:
+Una vez conectado, inicias sesión con tu correo/contraseña y el panel tiene **cuatro pestañas**:
 - **📸 Fotos y videos (Resultados)**: sube el archivo, escribe la descripción y categoría, ordena con las flechas ↑ ↓. Cada cambio se sube a Supabase Storage y se guarda en la base de datos de inmediato — no hay botón de "publicar", ya queda en línea.
 - **🖼️ Imagen del hero y fondos**: reemplaza la ilustración del hero por una foto real, y/o activa una foto de fondo en cualquier sección (Beneficios, Resultados, Productos, Testimonios, Capacitación/Distribuidores, Preguntas frecuentes), con un velo claro/oscuro ajustable para mantener el texto legible. También se publica al instante.
+- **🏅 Íconos de beneficios**: reemplaza los emojis de "Por qué D'Laurent" por tus propios logos/íconos, y edita el título/texto de cada beneficio.
+- **🛍️ Productos (Tienda)**: agrega, edita, reordena y elimina productos como en una tienda Shopify — foto, nombre, tagline, tamaño, precio en COP, insignia y características. Se publica al instante en la sección "Productos" de tu landing y alimenta el carrito de compra y los botones de pago de Wompi.
 
 Los archivos `gallery-data.js` y `site-images.js` locales quedan como **contenido de respaldo** (se usan solo si Supabase no está configurado o falla la conexión), así el sitio nunca se rompe por completo.
 
@@ -90,7 +92,7 @@ Si más adelante quieres centralizar los leads en una hoja de cálculo o CRM, se
 ## Pagos
 
 - **Nequi**: se muestra el número y el titular en el modal de pago; el cliente transfiere y envía el comprobante por WhatsApp.
-- **Wompi**: en cuanto generes tu link de pago (o tu integración de checkout de Wompi), pégalo en `wompiPaymentLink` (`assets/js/data.js`) y el botón "Pagar con Wompi" quedará activo automáticamente.
+- **Wompi**: los botones "Pagar con tarjeta o cuenta" y "Pagar con Nequi (5% dcto)" abren el Checkout de Wompi con el total del carrito (el de Nequi aplica el descuento configurado en `nequiDiscountPct`). Ambos usan solo la llave pública de Wompi.
 
 ## Cómo previsualizar localmente
 
