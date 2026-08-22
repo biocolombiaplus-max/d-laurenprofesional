@@ -310,6 +310,7 @@ header.site-header {
   background: linear-gradient(140deg, var(--purple-700), var(--purple-950)); color: var(--gold-light);
   margin-bottom: 20px; font-size: 24px;
 }
+.value-icon-img { width: 52px; height: 52px; object-fit: contain; margin-bottom: 20px; display: block; }
 .value-card h3 { font-size: 19px; color: var(--purple-950); margin-bottom: 10px; }
 .value-card p { color: #6b6478; font-size: 14.5px; line-height: 1.6; }
 

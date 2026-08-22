@@ -78,6 +78,7 @@
   <nav class="admin-tabs">
     <button class="admin-tab active" data-tab="gallery">📸 Fotos y videos (Resultados)</button>
     <button class="admin-tab" data-tab="images">🖼️ Imagen del hero y fondos</button>
+    <button class="admin-tab" data-tab="benefits">🏅 Íconos de beneficios</button>
   </nav>
 
   <main class="admin-grid" id="tabGallery">
@@ -182,6 +183,15 @@
       <div id="sectionBgList" style="margin-top:18px"></div>
     </section>
   </main>
+
+  <!-- ============ TAB: BENEFITS ICONS ============ -->
+  <main class="admin-grid" id="tabBenefits" hidden>
+    <section class="admin-card admin-card-wide">
+      <h2>Íconos de beneficios</h2>
+      <p class="admin-hint">Reemplaza los emojis de la sección "Por qué D'Laurent" por tus propios logos/íconos — ideal en PNG o SVG con <strong>fondo transparente</strong> para que se integren bien. Si no subes uno, se queda el emoji por defecto. También puedes editar el título y el texto de cada beneficio. Los cambios se publican al instante.</p>
+      <div id="benefitsList" style="margin-top:18px"></div>
+    </section>
+  </main>
 </div>
 
 <div class="toast" id="toast">
@@ -192,6 +202,7 @@
 <script src="assets/js/gallery-data.js"></script>
 <script src="assets/js/gallery-render.js"></script>
 <script src="assets/js/site-images.js"></script>
+<script src="assets/js/benefits-data.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="assets/js/supabase-config.js"></script>
 <script src="assets/js/admin.js"></script>

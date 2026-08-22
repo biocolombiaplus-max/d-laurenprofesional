@@ -19,11 +19,12 @@
   async function loadLiveContent() {
     if (typeof supabaseClient === "undefined" || !supabaseClient) return;
     try {
-      const { data, error } = await supabaseClient.from("site_content").select("key,data").in("key", ["gallery", "images"]);
+      const { data, error } = await supabaseClient.from("site_content").select("key,data").in("key", ["gallery", "images", "benefits"]);
       if (error) throw error;
 
       const galleryRow = (data || []).find((r) => r.key === "gallery");
       const imagesRow = (data || []).find((r) => r.key === "images");
+      const benefitsRow = (data || []).find((r) => r.key === "benefits");
 
       if (galleryRow && Array.isArray(galleryRow.data.items)) {
         GALLERY.length = 0;
@@ -40,6 +41,10 @@
             );
           });
         }
+      }
+      if (benefitsRow && Array.isArray(benefitsRow.data.items) && typeof BENEFITS !== "undefined") {
+        BENEFITS.length = 0;
+        BENEFITS.push(...benefitsRow.data.items);
       }
     } catch (err) {
       console.warn("No se pudo cargar el contenido en vivo desde Supabase, usando el contenido local.", err);
@@ -153,8 +158,7 @@
   /* ---------------------------------------------------------------------
      Scroll reveal
      --------------------------------------------------------------------- */
-  function initReveal() {
-    const items = document.querySelectorAll(".reveal, .reveal-scale");
+  function observeReveal(items) {
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -167,6 +171,10 @@
       { threshold: 0.15 }
     );
     items.forEach((el) => io.observe(el));
+  }
+
+  function initReveal() {
+    observeReveal(document.querySelectorAll(".reveal, .reveal-scale"));
   }
 
   function initTimeBars() {
@@ -205,6 +213,26 @@
   }
 
   /* ---------------------------------------------------------------------
+     Benefits (value props) render
+     --------------------------------------------------------------------- */
+  function renderBenefits() {
+    const grid = document.getElementById("valuesGrid");
+    if (!grid || typeof BENEFITS === "undefined") return;
+    grid.innerHTML = BENEFITS.map((b, i) => {
+      const iconHtml = b.image
+        ? `<img class="value-icon-img" src="${b.image}" alt="">`
+        : `<div class="value-icon">${b.icon}</div>`;
+      return `
+      <div class="value-card reveal" style="--i:${i}">
+        ${iconHtml}
+        <h3>${b.title}</h3>
+        <p>${b.description}</p>
+      </div>`;
+    }).join("");
+    observeReveal(grid.querySelectorAll(".reveal"));
+  }
+
+  /* ---------------------------------------------------------------------
      Products render + Cart
      --------------------------------------------------------------------- */
   let cart = [];
@@ -239,18 +267,7 @@
       btn.addEventListener("click", () => addToCart(btn.dataset.add));
     });
 
-    // re-observe newly injected reveal items
-    document.querySelectorAll("#productGrid .reveal").forEach((el) => {
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("in-view");
-            io.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.15 });
-      io.observe(el);
-    });
+    observeReveal(grid.querySelectorAll(".reveal"));
   }
 
   function addToCart(id) {
@@ -592,6 +609,7 @@
     initReveal();
     initTimeBars();
     initMobileNav();
+    renderBenefits();
     renderProducts();
     initCart();
     initPayModal();

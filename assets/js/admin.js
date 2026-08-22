@@ -125,6 +125,7 @@
         tabs.forEach((b) => b.classList.toggle("active", b === btn));
         document.getElementById("tabGallery").hidden = tab !== "gallery";
         document.getElementById("tabImages").hidden = tab !== "images";
+        document.getElementById("tabBenefits").hidden = tab !== "benefits";
       });
     });
   }
@@ -515,6 +516,114 @@
     });
   }
 
+  /* =======================================================================
+     TAB 3 — Benefits icons
+     ======================================================================= */
+  let benefits = [];
+  let saveBenefitsTimer = null;
+
+  async function loadBenefitsState() {
+    try {
+      const { data, error } = await supabaseClient.from("site_content").select("data").eq("key", "benefits").maybeSingle();
+      if (error) throw error;
+      if (data && Array.isArray(data.data.items)) return data.data.items;
+    } catch (e) {
+      console.warn("No se pudo leer los beneficios desde Supabase, usando el contenido local.", e);
+    }
+    return typeof BENEFITS !== "undefined" ? JSON.parse(JSON.stringify(BENEFITS)) : [];
+  }
+
+  function scheduleSaveBenefits() {
+    setSaveStatus("saving");
+    clearTimeout(saveBenefitsTimer);
+    saveBenefitsTimer = setTimeout(async () => {
+      try {
+        const { error } = await supabaseClient.from("site_content").upsert({ key: "benefits", data: { items: benefits } });
+        if (error) throw error;
+        setSaveStatus("ok");
+      } catch (e) {
+        console.error(e);
+        setSaveStatus("error");
+        showToast("No se pudo guardar. Revisa tu conexión e inténtalo de nuevo.");
+      }
+    }, 500);
+  }
+
+  function renderBenefitsList() {
+    const container = document.getElementById("benefitsList");
+    container.innerHTML = benefits
+      .map((b, i) => {
+        const thumb = b.image || "";
+        return `
+        <div class="admin-bg-block enabled" data-idx="${i}">
+          <div class="admin-bg-head">
+            <label style="cursor:default">${escapeHtml(b.icon)} Beneficio ${i + 1}</label>
+          </div>
+          <div class="admin-bg-fields" style="display:grid">
+            <div class="field">
+              <label>Título</label>
+              <input type="text" class="benefit-title" value="${escapeHtml(b.title)}">
+              <label style="margin-top:10px">Descripción</label>
+              <input type="text" class="benefit-desc" value="${escapeHtml(b.description)}">
+            </div>
+            <div class="field">
+              <label>Logo / ícono propio (opcional, fondo transparente ideal)</label>
+              <input type="file" class="benefit-file" accept="image/*">
+              <p class="admin-hint benefit-filename">${thumb ? "Logo cargado ✓" : "Usando emoji por defecto: " + b.icon}</p>
+              ${thumb ? `<button type="button" class="admin-link-btn benefit-clear">Quitar logo y volver al emoji</button>` : ""}
+            </div>
+            <img class="admin-bg-thumb benefit-thumb" src="${thumb}" alt="" style="${thumb ? "" : "background:#f3ede0"}">
+          </div>
+        </div>`;
+      })
+      .join("");
+  }
+
+  function initBenefitsForm() {
+    const container = document.getElementById("benefitsList");
+    container.addEventListener("input", (e) => {
+      const block = e.target.closest(".admin-bg-block");
+      if (!block) return;
+      const idx = Number(block.dataset.idx);
+      if (e.target.classList.contains("benefit-title")) {
+        benefits[idx].title = e.target.value;
+        scheduleSaveBenefits();
+      } else if (e.target.classList.contains("benefit-desc")) {
+        benefits[idx].description = e.target.value;
+        scheduleSaveBenefits();
+      }
+    });
+
+    container.addEventListener("click", (e) => {
+      if (!e.target.classList.contains("benefit-clear")) return;
+      const block = e.target.closest(".admin-bg-block");
+      const idx = Number(block.dataset.idx);
+      benefits[idx].image = "";
+      renderBenefitsList();
+      scheduleSaveBenefits();
+      showToast("Logo eliminado, volviendo al emoji");
+    });
+
+    container.addEventListener("change", async (e) => {
+      if (!e.target.classList.contains("benefit-file")) return;
+      const block = e.target.closest(".admin-bg-block");
+      const idx = Number(block.dataset.idx);
+      const file = e.target.files[0];
+      if (!file) return;
+      showToast("Subiendo logo…");
+      try {
+        const url = await uploadFile("backgrounds", file);
+        benefits[idx].image = url;
+        renderBenefitsList();
+        scheduleSaveBenefits();
+        showToast("Logo publicado ✓");
+      } catch (err) {
+        console.error(err);
+        showToast("No se pudo subir el logo. Inténtalo de nuevo.");
+      }
+    });
+  }
+
   /* ---------------------------------------------------------------------
      Init
      --------------------------------------------------------------------- */
@@ -531,6 +640,10 @@
     initHeroForm();
     renderSectionBgList();
     initSectionBackgrounds();
+
+    benefits = await loadBenefitsState();
+    renderBenefitsList();
+    initBenefitsForm();
 
     setSaveStatus("ok");
   }
