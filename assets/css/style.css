@@ -386,8 +386,8 @@ header.site-header {
 .calc-col-sub { display: block; font-size: 12px; color: rgba(255,255,255,.6); margin-top: 6px; }
 .calc-arrow { font-size: 20px; color: var(--gold); flex-shrink: 0; }
 .calc-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: rgba(255,255,255,.12); border-radius: var(--radius-md); overflow: hidden; position: relative; z-index: 1; }
-.calc-stat { background: rgba(255,255,255,.04); padding: 18px 14px; text-align: center; }
-.calc-stat .v { font-family: var(--font-mono, var(--font-display)); font-size: 19px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; }
+.calc-stat { background: rgba(255,255,255,.04); padding: 18px 14px; text-align: center; min-width: 0; }
+.calc-stat .v { font-family: var(--font-mono, var(--font-display)); font-size: 19px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .calc-stat .l { font-size: 11px; color: rgba(255,255,255,.6); margin-top: 6px; line-height: 1.4; }
 .calc-stat.highlight { background: linear-gradient(140deg, rgba(201,169,97,.35), rgba(201,169,97,.12)); }
 .calc-stat.highlight .v { color: var(--gold-light); }
@@ -397,6 +397,14 @@ header.site-header {
 @media (max-width: 860px) {
   .calc-wrap { grid-template-columns: 1fr; }
   .calc-inputs, .calc-results { padding: 34px 26px; }
+}
+@media (max-width: 480px) {
+  .calc-inputs, .calc-results { padding: 26px 16px; }
+  .calc-big { font-size: 34px; }
+  .calc-col-label { font-size: 10px; }
+  .calc-stat { padding: 14px 6px; }
+  .calc-stat .v { font-size: 14.5px; }
+  .calc-stat .l { font-size: 9.5px; }
 }
 
 /* ---------- Gallery ---------- */
@@ -544,6 +552,7 @@ header.site-header {
 .salones-empty-icon { font-size: 38px; margin-bottom: 14px; }
 .salones-empty h3 { font-size: 19px; color: var(--purple-950); margin-bottom: 10px; }
 .salones-empty p { font-size: 14px; color: #8a8296; line-height: 1.65; margin-bottom: 22px; }
+.salones-empty .btn { white-space: normal; max-width: 100%; }
 
 @media (max-width: 900px) {
   .salones-grid { grid-template-columns: repeat(2, 1fr); }
@@ -698,6 +707,7 @@ footer { background: var(--ink); color: rgba(255,255,255,.65); padding: 70px 0 2
 }
 @media (max-width: 640px) {
   .section-pad { padding: 70px 0; }
+  .hero { padding: 40px 0 60px; }
   .values-grid, .product-grid, .gallery-grid { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
   .hero-stats { flex-wrap: wrap; gap: 22px; }
