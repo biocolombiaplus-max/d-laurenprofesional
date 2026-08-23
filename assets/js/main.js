@@ -19,13 +19,14 @@
   async function loadLiveContent() {
     if (typeof supabaseClient === "undefined" || !supabaseClient) return;
     try {
-      const { data, error } = await supabaseClient.from("site_content").select("key,data").in("key", ["gallery", "images", "benefits", "products"]);
+      const { data, error } = await supabaseClient.from("site_content").select("key,data").in("key", ["gallery", "images", "benefits", "products", "salons"]);
       if (error) throw error;
 
       const galleryRow = (data || []).find((r) => r.key === "gallery");
       const imagesRow = (data || []).find((r) => r.key === "images");
       const benefitsRow = (data || []).find((r) => r.key === "benefits");
       const productsRow = (data || []).find((r) => r.key === "products");
+      const salonsRow = (data || []).find((r) => r.key === "salons");
 
       if (galleryRow && Array.isArray(galleryRow.data.items)) {
         GALLERY.length = 0;
@@ -50,6 +51,10 @@
       if (productsRow && Array.isArray(productsRow.data.items) && typeof PRODUCTS !== "undefined") {
         PRODUCTS.length = 0;
         PRODUCTS.push(...productsRow.data.items);
+      }
+      if (salonsRow && Array.isArray(salonsRow.data.items) && typeof SALONS !== "undefined") {
+        SALONS.length = 0;
+        SALONS.push(...salonsRow.data.items);
       }
     } catch (err) {
       console.warn("No se pudo cargar el contenido en vivo desde Supabase, usando el contenido local.", err);
@@ -199,6 +204,38 @@
   }
 
   /* ---------------------------------------------------------------------
+     Calculadora de rentabilidad (para estilistas y salones)
+     --------------------------------------------------------------------- */
+  function initCalculator() {
+    const elServicios = document.getElementById("calcServicios");
+    const elPrecio = document.getElementById("calcPrecio");
+    const elDias = document.getElementById("calcDias");
+    if (!elServicios || !elPrecio || !elDias) return;
+
+    const TIME_FACTOR = 0.3; // el alisado iónico toma hasta 70% menos tiempo
+
+    function compute() {
+      const servicios = Math.max(0, Number(elServicios.value) || 0);
+      const precio = Math.max(0, Number(elPrecio.value) || 0);
+      const dias = Math.max(0, Number(elDias.value) || 0);
+
+      const nuevoServicios = Math.floor(servicios / TIME_FACTOR);
+      const extraDia = Math.max(0, nuevoServicios - servicios);
+      const extraMes = extraDia * precio * dias;
+      const extraAnio = extraMes * 12;
+
+      document.getElementById("calcHoyServicios").textContent = servicios;
+      document.getElementById("calcNuevoServicios").textContent = nuevoServicios;
+      document.getElementById("calcExtraDia").textContent = "+" + extraDia;
+      document.getElementById("calcExtraMes").textContent = fmtCOP(extraMes);
+      document.getElementById("calcExtraAnio").textContent = fmtCOP(extraAnio);
+    }
+
+    [elServicios, elPrecio, elDias].forEach((el) => el.addEventListener("input", compute));
+    compute();
+  }
+
+  /* ---------------------------------------------------------------------
      Mobile nav
      --------------------------------------------------------------------- */
   function initMobileNav() {
@@ -235,6 +272,102 @@
       </div>`;
     }).join("");
     observeReveal(grid.querySelectorAll(".reveal"));
+  }
+
+  /* ---------------------------------------------------------------------
+     Salones aliados: directorio filtrable por departamento/ciudad, con
+     ubicación en Google Maps (sin llave de API — usa el embed público).
+     --------------------------------------------------------------------- */
+  let salonesFiltered = [];
+
+  function salonMapsQuery(s) {
+    return [s.direccion, s.ciudad, s.departamento, "Colombia"].filter(Boolean).join(", ");
+  }
+
+  function salonCardHTML(s, i) {
+    const q = encodeURIComponent(salonMapsQuery(s));
+    const embedSrc = `https://www.google.com/maps?q=${q}&output=embed`;
+    const viewUrl = `https://www.google.com/maps/search/?api=1&query=${q}`;
+    const waMsg = encodeURIComponent(`Hola, vi ${s.nombre} como Salón Aliado D'Laurent y quiero agendar mi alisado iónico.`);
+    const waHref = s.whatsapp ? `https://wa.me/${s.whatsapp}?text=${waMsg}` : "";
+    const logoHtml = s.logo
+      ? `<img class="salon-logo" src="${s.logo}" alt="">`
+      : `<div class="salon-logo" style="display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--font-display);font-size:18px">${(s.nombre || "?").charAt(0)}</div>`;
+
+    return `
+    <div class="salon-card reveal" style="--i:${i % 6}">
+      <div class="salon-map"><iframe src="${embedSrc}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Ubicación de ${s.nombre}"></iframe></div>
+      <div class="salon-body">
+        <div class="salon-head">
+          ${logoHtml}
+          <div>
+            <h4>${s.nombre}${s.fundador ? '<span class="salon-badge">★ Fundador</span>' : ""}</h4>
+            <span class="salon-loc">${s.ciudad}, ${s.departamento}</span>
+          </div>
+        </div>
+        <p class="salon-address">${s.direccion || ""}</p>
+        <div class="salon-actions">
+          <a href="${viewUrl}" target="_blank" rel="noopener" class="btn btn-dark btn-sm">📍 Ver en Google Maps</a>
+          ${waHref ? `<a href="${waHref}" target="_blank" rel="noopener" class="btn btn-whatsapp btn-sm">WhatsApp</a>` : ""}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function renderSalonesGrid(list) {
+    const grid = document.getElementById("salonesGrid");
+    const empty = document.getElementById("salonesEmpty");
+    if (!grid) return;
+    grid.innerHTML = list.map(salonCardHTML).join("");
+    empty.classList.toggle("show", list.length === 0);
+    observeReveal(grid.querySelectorAll(".reveal"));
+  }
+
+  function populateCityFilter(depto) {
+    const citySelect = document.getElementById("filterCiudad");
+    const cities = Array.from(
+      new Set(SALONS.filter((s) => depto === "todos" || s.departamento === depto).map((s) => s.ciudad))
+    ).sort();
+    citySelect.innerHTML =
+      `<option value="todos">Todas las ciudades</option>` + cities.map((c) => `<option value="${c}">${c}</option>`).join("");
+  }
+
+  function applySalonesFilter() {
+    const depto = document.getElementById("filterDepto").value;
+    const ciudad = document.getElementById("filterCiudad").value;
+    salonesFiltered = SALONS.filter(
+      (s) => (depto === "todos" || s.departamento === depto) && (ciudad === "todos" || s.ciudad === ciudad)
+    );
+    renderSalonesGrid(salonesFiltered);
+  }
+
+  function renderSalones() {
+    const filtersEl = document.getElementById("salonesFilters");
+    const founderCountEl = document.getElementById("founderCount");
+    if (!filtersEl || typeof SALONS === "undefined") return;
+
+    founderCountEl.textContent = Math.min(20, SALONS.filter((s) => s.fundador).length);
+
+    if (SALONS.length === 0) {
+      filtersEl.hidden = true;
+      renderSalonesGrid([]);
+      return;
+    }
+    filtersEl.hidden = false;
+
+    const deptoSelect = document.getElementById("filterDepto");
+    const deptos = Array.from(new Set(SALONS.map((s) => s.departamento))).sort();
+    deptoSelect.innerHTML =
+      `<option value="todos">Todos los departamentos</option>` + deptos.map((d) => `<option value="${d}">${d}</option>`).join("");
+    populateCityFilter("todos");
+
+    deptoSelect.addEventListener("change", () => {
+      populateCityFilter(deptoSelect.value);
+      applySalonesFilter();
+    });
+    document.getElementById("filterCiudad").addEventListener("change", applySalonesFilter);
+
+    applySalonesFilter();
   }
 
   /* ---------------------------------------------------------------------
@@ -660,8 +793,10 @@
     startCountdown();
     initReveal();
     initTimeBars();
+    initCalculator();
     initMobileNav();
     renderBenefits();
+    renderSalones();
     renderProducts();
     initCart();
     initPayModal();

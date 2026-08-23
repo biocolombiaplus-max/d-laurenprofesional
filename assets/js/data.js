@@ -85,6 +85,12 @@ const PRODUCTS = [
   },
 ];
 
+/* SALONS: contenido de respaldo para la sección "Salones Aliados". Agrega,
+   edita, elimina y marca salones como "Fundador" de forma visual desde la
+   pestaña "Salones Aliados" del panel administrador (/admin.html). No hace
+   falta llave de Google Maps: el mapa se genera a partir de la dirección. */
+const SALONS = [];
+
 /* Reseñas — edítalas libremente. Se muestran en el carrusel de testimonios. */
 const REVIEWS = [
   {

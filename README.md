@@ -73,11 +73,14 @@ Mientras `supabase-config.js` tenga los valores de fábrica (`"TU_SUPABASE_URL"`
 
 ### Uso diario
 
-Una vez conectado, inicias sesión con tu correo/contraseña y el panel tiene **cuatro pestañas**:
+Una vez conectado, inicias sesión con tu correo/contraseña y el panel tiene **cinco pestañas**:
 - **📸 Fotos y videos (Resultados)**: sube el archivo, escribe la descripción y categoría, ordena con las flechas ↑ ↓. Cada cambio se sube a Supabase Storage y se guarda en la base de datos de inmediato — no hay botón de "publicar", ya queda en línea.
 - **🖼️ Imagen del hero y fondos**: reemplaza la ilustración del hero por una foto real, y/o activa una foto de fondo en cualquier sección (Beneficios, Resultados, Productos, Testimonios, Capacitación/Distribuidores, Preguntas frecuentes), con un velo claro/oscuro ajustable para mantener el texto legible. También se publica al instante.
 - **🏅 Íconos de beneficios**: reemplaza los emojis de "Por qué D'Laurent" por tus propios logos/íconos, y edita el título/texto de cada beneficio.
 - **🛍️ Productos (Tienda)**: agrega, edita, reordena y elimina productos como en una tienda Shopify — foto, nombre, tagline, tamaño, precio en COP, insignia y características. Se publica al instante en la sección "Productos" de tu landing y alimenta el carrito de compra y los botones de pago de Wompi.
+- **📍 Salones Aliados**: agrega, edita y elimina los salones de tu red de distribución — nombre, departamento, ciudad/municipio, dirección, WhatsApp e Instagram opcionales, logo y la insignia "★ Fundador" para los primeros 20 del lanzamiento. No necesitas ninguna llave de Google Maps: el mapa de cada salón se genera automáticamente a partir de la dirección. Se publica al instante en la sección "Salones Aliados" de tu landing, con filtros por departamento y ciudad para tus clientas.
+
+La landing también incluye una **calculadora de rentabilidad** (sección "Calculadora", antes de "Resultados") para que estilistas y salones vean en pesos cuánto pueden ganar al reducir el tiempo de aplicación — no requiere configuración, funciona sola con los datos que el visitante ingresa.
 
 Los archivos `gallery-data.js` y `site-images.js` locales quedan como **contenido de respaldo** (se usan solo si Supabase no está configurado o falla la conexión), así el sitio nunca se rompe por completo.
 

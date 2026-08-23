@@ -127,6 +127,7 @@
         document.getElementById("tabImages").hidden = tab !== "images";
         document.getElementById("tabBenefits").hidden = tab !== "benefits";
         document.getElementById("tabProducts").hidden = tab !== "products";
+        document.getElementById("tabSalones").hidden = tab !== "salones";
       });
     });
   }
@@ -854,6 +855,226 @@
     document.getElementById("cancelEditProduct").addEventListener("click", resetProductForm);
   }
 
+  /* =======================================================================
+     TAB 5 — Salones aliados (directorio con ubicación en Google Maps)
+     ======================================================================= */
+  const COLOMBIA_DEPARTAMENTOS = [
+    "Amazonas", "Antioquia", "Arauca", "Atlántico", "Bogotá D.C.", "Bolívar", "Boyacá", "Caldas",
+    "Caquetá", "Casanare", "Cauca", "Cesar", "Chocó", "Córdoba", "Cundinamarca", "Guainía", "Guaviare",
+    "Huila", "La Guajira", "Magdalena", "Meta", "Nariño", "Norte de Santander", "Putumayo", "Quindío",
+    "Risaralda", "San Andrés y Providencia", "Santander", "Sucre", "Tolima", "Valle del Cauca", "Vaupés", "Vichada",
+  ];
+
+  let salones = [];
+  let editingSalonIndex = null;
+  let pendingSalonLogo = "";
+  let saveSalonesTimer = null;
+
+  function salonMapsQuery(s) {
+    return [s.direccion, s.ciudad, s.departamento, "Colombia"].filter(Boolean).join(", ");
+  }
+
+  function salonPreviewCardHTML(s) {
+    const q = encodeURIComponent(salonMapsQuery(s));
+    const embedSrc = `https://www.google.com/maps?q=${q}&output=embed`;
+    const logoHtml = s.logo
+      ? `<img class="salon-logo" src="${s.logo}" alt="">`
+      : `<div class="salon-logo" style="display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--font-display);font-size:18px">${escapeHtml((s.nombre || "?").charAt(0))}</div>`;
+    return `
+    <div class="salon-card">
+      <div class="salon-map"><iframe src="${embedSrc}" loading="lazy" title="Ubicación de ${escapeHtml(s.nombre)}"></iframe></div>
+      <div class="salon-body">
+        <div class="salon-head">
+          ${logoHtml}
+          <div>
+            <h4>${escapeHtml(s.nombre)}${s.fundador ? '<span class="salon-badge">★ Fundador</span>' : ""}</h4>
+            <span class="salon-loc">${escapeHtml(s.ciudad)}, ${escapeHtml(s.departamento)}</span>
+          </div>
+        </div>
+        <p class="salon-address">${escapeHtml(s.direccion || "")}</p>
+      </div>
+    </div>`;
+  }
+
+  async function loadSalonsState() {
+    try {
+      const { data, error } = await supabaseClient.from("site_content").select("data").eq("key", "salons").maybeSingle();
+      if (error) throw error;
+      if (data && Array.isArray(data.data.items)) return data.data.items;
+    } catch (e) {
+      console.warn("No se pudo leer los salones aliados desde Supabase, usando el contenido local.", e);
+    }
+    return typeof SALONS !== "undefined" ? JSON.parse(JSON.stringify(SALONS)) : [];
+  }
+
+  async function saveSalonesNow() {
+    setSaveStatus("saving");
+    try {
+      const { error } = await supabaseClient.from("site_content").upsert({ key: "salons", data: { items: salones } });
+      if (error) throw error;
+      setSaveStatus("ok");
+    } catch (e) {
+      console.error(e);
+      setSaveStatus("error");
+      showToast("No se pudo guardar. Revisa tu conexión e inténtalo de nuevo.");
+    }
+  }
+
+  function renderSalonesManageList() {
+    const list = document.getElementById("salonesManageList");
+    document.getElementById("salonesCount").textContent = salones.length;
+    document.getElementById("salonesFundadorCount").textContent = Math.min(20, salones.filter((s) => s.fundador).length);
+    if (salones.length === 0) {
+      list.innerHTML = `<div class="admin-manage-empty">Aún no has agregado salones aliados. Usa el formulario de la izquierda.</div>`;
+      return;
+    }
+    list.innerHTML = salones
+      .map((s, i) => `
+        <div class="admin-manage-item">
+          ${s.logo ? `<img src="${s.logo}" alt="">` : `<div style="width:48px;height:62px;border-radius:6px;background:var(--purple-950);flex-shrink:0"></div>`}
+          <div class="mi-info">
+            <div class="mi-caption">${escapeHtml(s.nombre)}${s.fundador ? " ★" : ""}</div>
+            <div class="mi-meta">${escapeHtml(s.ciudad)}, ${escapeHtml(s.departamento)}</div>
+          </div>
+          <div class="mi-actions">
+            <button data-edit="${i}" title="Editar">✎</button>
+            <button data-del="${i}" class="mi-delete" title="Eliminar">✕</button>
+          </div>
+        </div>`)
+      .join("");
+
+    list.querySelectorAll("[data-edit]").forEach((b) => b.addEventListener("click", () => startEditSalon(Number(b.dataset.edit))));
+    list.querySelectorAll("[data-del]").forEach((b) => b.addEventListener("click", () => deleteSalon(Number(b.dataset.del))));
+  }
+
+  function renderSalonesPreview() {
+    const grid = document.getElementById("salonesPreviewGrid");
+    if (!grid) return;
+    grid.innerHTML = salones.map(salonPreviewCardHTML).join("");
+  }
+
+  async function deleteSalon(index) {
+    const s = salones[index];
+    if (!s) return;
+    if (!confirm(`¿Eliminar "${s.nombre}" de los salones aliados? Esto se publica de inmediato.`)) return;
+    salones.splice(index, 1);
+    if (editingSalonIndex === index) resetSalonForm();
+    await persistAndRenderSalones();
+    showToast("Salón eliminado");
+  }
+
+  async function persistAndRenderSalones() {
+    renderSalonesManageList();
+    renderSalonesPreview();
+    await saveSalonesNow();
+  }
+
+  function startEditSalon(index) {
+    const s = salones[index];
+    if (!s) return;
+    editingSalonIndex = index;
+    pendingSalonLogo = "";
+    document.getElementById("salonNombre").value = s.nombre || "";
+    document.getElementById("salonDepto").value = s.departamento || "";
+    document.getElementById("salonCiudad").value = s.ciudad || "";
+    document.getElementById("salonDireccion").value = s.direccion || "";
+    document.getElementById("salonWhatsapp").value = s.whatsapp || "";
+    document.getElementById("salonInstagram").value = s.instagram || "";
+    document.getElementById("salonFundador").checked = !!s.fundador;
+    const previewImg = document.getElementById("salonPreviewImg");
+    const previewBox = document.getElementById("salonPreviewBox");
+    if (s.logo) {
+      previewImg.src = s.logo;
+      previewBox.hidden = false;
+    } else {
+      previewBox.hidden = true;
+    }
+    document.getElementById("salonFormTitle").textContent = "Editar salón aliado";
+    document.getElementById("addSalonBtn").textContent = "Actualizar salón aliado";
+    document.getElementById("cancelEditSalon").hidden = false;
+  }
+
+  function resetSalonForm() {
+    editingSalonIndex = null;
+    pendingSalonLogo = "";
+    document.getElementById("salonNombre").value = "";
+    document.getElementById("salonDepto").selectedIndex = 0;
+    document.getElementById("salonCiudad").value = "";
+    document.getElementById("salonDireccion").value = "";
+    document.getElementById("salonWhatsapp").value = "";
+    document.getElementById("salonInstagram").value = "";
+    document.getElementById("salonFundador").checked = false;
+    document.getElementById("salonFile").value = "";
+    document.getElementById("salonPreviewBox").hidden = true;
+    document.getElementById("salonFormTitle").textContent = "Agregar salón aliado";
+    document.getElementById("addSalonBtn").textContent = "+ Agregar salón aliado";
+    document.getElementById("cancelEditSalon").hidden = true;
+  }
+
+  function initSalonesForm() {
+    const deptoSelect = document.getElementById("salonDepto");
+    deptoSelect.innerHTML = COLOMBIA_DEPARTAMENTOS.map((d) => `<option value="${d}">${d}</option>`).join("");
+
+    const fileInput = document.getElementById("salonFile");
+    const previewBox = document.getElementById("salonPreviewBox");
+    const previewImg = document.getElementById("salonPreviewImg");
+    const addBtn = document.getElementById("addSalonBtn");
+    const progressEl = document.getElementById("salonUploadProgress");
+
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      previewImg.src = URL.createObjectURL(file);
+      previewBox.hidden = false;
+      progressEl.textContent = "Subiendo logo…";
+      try {
+        pendingSalonLogo = await uploadFile("backgrounds", file);
+        progressEl.textContent = "Logo listo ✓";
+      } catch (e) {
+        console.error(e);
+        progressEl.textContent = "";
+        showToast("No se pudo subir el logo. Inténtalo de nuevo.");
+      }
+    });
+
+    addBtn.addEventListener("click", async () => {
+      const nombre = document.getElementById("salonNombre").value.trim();
+      const departamento = document.getElementById("salonDepto").value;
+      const ciudad = document.getElementById("salonCiudad").value.trim();
+      const direccion = document.getElementById("salonDireccion").value.trim();
+      const whatsapp = document.getElementById("salonWhatsapp").value.trim().replace(/[^0-9]/g, "");
+      const instagram = document.getElementById("salonInstagram").value.trim();
+      const fundador = document.getElementById("salonFundador").checked;
+
+      if (!nombre || !ciudad || !direccion) {
+        showToast("Completa nombre, ciudad y dirección");
+        return;
+      }
+
+      const existingLogo = editingSalonIndex != null ? salones[editingSalonIndex].logo : "";
+      const logo = pendingSalonLogo || existingLogo || "";
+
+      const salonData = {
+        id: editingSalonIndex != null ? salones[editingSalonIndex].id : uid(),
+        nombre, departamento, ciudad, direccion, whatsapp, instagram, logo, fundador,
+      };
+
+      addBtn.disabled = true;
+      if (editingSalonIndex != null) {
+        salones[editingSalonIndex] = salonData;
+      } else {
+        salones.push(salonData);
+      }
+
+      await persistAndRenderSalones();
+      showToast(editingSalonIndex != null ? "Salón actualizado ✓" : "Salón agregado — ya está en línea ✓");
+      resetSalonForm();
+      addBtn.disabled = false;
+    });
+
+    document.getElementById("cancelEditSalon").addEventListener("click", resetSalonForm);
+  }
+
   /* ---------------------------------------------------------------------
      Init
      --------------------------------------------------------------------- */
@@ -879,6 +1100,11 @@
     initProductsForm();
     renderProductsManageList();
     renderProductsPreview();
+
+    salones = await loadSalonsState();
+    initSalonesForm();
+    renderSalonesManageList();
+    renderSalonesPreview();
 
     setSaveStatus("ok");
   }

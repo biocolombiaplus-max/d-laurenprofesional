@@ -80,6 +80,7 @@
     <button class="admin-tab" data-tab="images">🖼️ Imagen del hero y fondos</button>
     <button class="admin-tab" data-tab="benefits">🏅 Íconos de beneficios</button>
     <button class="admin-tab" data-tab="products">🛍️ Productos (Tienda)</button>
+    <button class="admin-tab" data-tab="salones">📍 Salones Aliados</button>
   </nav>
 
   <main class="admin-grid" id="tabGallery">
@@ -261,6 +262,79 @@
     <section class="admin-card admin-card-wide">
       <h2>Vista previa — así se ve en tu landing</h2>
       <div class="product-grid" id="productsPreviewGrid" style="margin-top:18px"></div>
+    </section>
+  </main>
+
+  <!-- ============ TAB: SALONES ALIADOS ============ -->
+  <main class="admin-grid" id="tabSalones" hidden>
+    <!-- ---------- FORM: add/edit salon ---------- -->
+    <section class="admin-card">
+      <h2 id="salonFormTitle">Agregar salón aliado</h2>
+      <p class="admin-hint">Los primeros 20 que marques como "Fundador" aparecen con la insignia especial en la landing. No necesitas ninguna llave de Google Maps: el mapa se genera solo a partir de la dirección.</p>
+
+      <div class="field">
+        <label>Nombre del salón</label>
+        <input type="text" id="salonNombre" placeholder="Ej: Salón Bella Imagen">
+      </div>
+
+      <div class="admin-field-row">
+        <div class="field" style="flex:1">
+          <label>Departamento</label>
+          <select id="salonDepto"></select>
+        </div>
+        <div class="field" style="flex:1">
+          <label>Ciudad / Municipio</label>
+          <input type="text" id="salonCiudad" placeholder="Ej: Medellín">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Dirección</label>
+        <input type="text" id="salonDireccion" placeholder="Ej: Cra 45 #10-20, Local 3, El Poblado">
+      </div>
+
+      <div class="admin-field-row">
+        <div class="field" style="flex:1">
+          <label>WhatsApp del salón (opcional)</label>
+          <input type="text" id="salonWhatsapp" placeholder="Ej: 573001234567">
+        </div>
+        <div class="field" style="flex:1">
+          <label>Instagram (opcional)</label>
+          <input type="text" id="salonInstagram" placeholder="Ej: @salonbellaimagen">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Logo o foto del salón (opcional)</label>
+        <input type="file" id="salonFile" accept="image/*">
+      </div>
+
+      <div class="admin-preview-box" id="salonPreviewBox" hidden style="border-radius:50%; max-width:80px; aspect-ratio:1/1">
+        <img id="salonPreviewImg" alt="Vista previa del logo">
+      </div>
+
+      <label class="admin-radio" style="margin-top:16px">
+        <input type="checkbox" id="salonFundador"> ★ Marcar como Salón Fundador (primeros 20 del lanzamiento)
+      </label>
+
+      <button class="btn btn-gold btn-block" id="addSalonBtn" style="margin-top:16px">+ Agregar salón aliado</button>
+      <button class="admin-link-btn" id="cancelEditSalon" hidden style="margin-top:10px">Cancelar edición</button>
+      <p class="admin-hint" id="salonUploadProgress"></p>
+    </section>
+
+    <!-- ---------- MANAGE LIST ---------- -->
+    <section class="admin-card">
+      <div class="admin-card-head">
+        <h2>Salones aliados (<span id="salonesCount">0</span>) · Fundadores: <span id="salonesFundadorCount">0</span>/20</h2>
+      </div>
+      <p class="admin-hint">Usa ✎ para editar y ✕ para eliminar.</p>
+      <div class="admin-manage-list" id="salonesManageList"></div>
+    </section>
+
+    <!-- ---------- LIVE PREVIEW ---------- -->
+    <section class="admin-card admin-card-wide">
+      <h2>Vista previa — así se ve en tu landing</h2>
+      <div class="salones-grid" id="salonesPreviewGrid" style="margin-top:18px; display:grid; grid-template-columns:repeat(3,1fr); gap:20px"></div>
     </section>
   </main>
 </div>

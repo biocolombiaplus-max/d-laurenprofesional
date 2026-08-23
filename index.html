@@ -72,6 +72,7 @@
       <a href="#beneficios">Beneficios</a>
       <a href="#productos">Productos</a>
       <a href="#resultados">Resultados</a>
+      <a href="#salones">Salones Aliados</a>
       <a href="#testimonios">Testimonios</a>
       <a href="#registro">Capacitación / Distribuidores</a>
       <a href="#faq">Preguntas</a>
@@ -91,6 +92,7 @@
   <a href="#beneficios">Beneficios</a>
   <a href="#productos">Productos</a>
   <a href="#resultados">Resultados</a>
+  <a href="#salones">Salones Aliados</a>
   <a href="#testimonios">Testimonios</a>
   <a href="#registro">Capacitación / Distribuidores</a>
   <a href="#faq">Preguntas</a>
@@ -189,6 +191,70 @@
   </div>
 </section>
 
+<!-- ============ CALCULADORA DE RENTABILIDAD ============ -->
+<section class="section-pad" id="calculadora" style="background:#fff">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Para estilistas y salones</span>
+      <h2>Calcula cuánto puedes ganar al bajar el tiempo de aplicación</h2>
+      <p>No es solo velocidad: es un resultado más duradero y de mejor calidad, en una fracción del tiempo. Ingresa tus números reales y compruébalo.</p>
+    </div>
+
+    <div class="calc-wrap reveal-scale">
+      <div class="calc-inputs">
+        <div class="calc-field">
+          <label for="calcServicios">¿Cuántos servicios de alisado haces hoy al día?</label>
+          <input type="number" id="calcServicios" min="1" max="20" value="2">
+        </div>
+        <div class="calc-field">
+          <label for="calcPrecio">¿Cuánto cobras por servicio? (COP)</label>
+          <input type="number" id="calcPrecio" min="0" step="10000" value="180000">
+        </div>
+        <div class="calc-field">
+          <label for="calcDias">¿Cuántos días trabajas al mes?</label>
+          <input type="number" id="calcDias" min="1" max="31" value="24">
+        </div>
+        <p class="calc-hint">El cálculo se actualiza al instante y se basa en reducir el tiempo de aplicación hasta un 70% — la misma jornada rinde para muchos más servicios.</p>
+      </div>
+
+      <div class="calc-results">
+        <div class="calc-compare">
+          <div class="calc-col-r old">
+            <span class="calc-col-label">Hoy</span>
+            <div class="calc-big" id="calcHoyServicios">2</div>
+            <span class="calc-col-sub">servicios al día</span>
+          </div>
+          <div class="calc-arrow">→</div>
+          <div class="calc-col-r new">
+            <span class="calc-col-label">Con Alisado Iónico</span>
+            <div class="calc-big" id="calcNuevoServicios">6</div>
+            <span class="calc-col-sub">servicios al día posibles</span>
+          </div>
+        </div>
+
+        <div class="calc-stats">
+          <div class="calc-stat">
+            <div class="v" id="calcExtraDia">+4</div>
+            <div class="l">servicios extra por día</div>
+          </div>
+          <div class="calc-stat">
+            <div class="v" id="calcExtraMes">$0</div>
+            <div class="l">ingreso extra al mes</div>
+          </div>
+          <div class="calc-stat highlight">
+            <div class="v" id="calcExtraAnio">$0</div>
+            <div class="l">ingreso extra al año</div>
+          </div>
+        </div>
+
+        <a href="#registro" class="btn btn-gold btn-block">Quiero ser Salón Aliado →</a>
+      </div>
+    </div>
+
+    <p class="calc-note reveal">💡 El ahorro de tiempo no compromete el resultado: el alisado iónico D'Laurent está formulado para durar más y verse mejor que un alisado tradicional, incluso aplicándose en una hora o menos. Cálculo estimado; tu resultado real depende de tu operación.</p>
+  </div>
+</section>
+
 <!-- ============ GALLERY / RESULTADOS ============ -->
 <section class="section-pad" id="resultados" style="background:#fff">
   <div class="container">
@@ -238,6 +304,44 @@
         <a href="#" id="ctaWhatsapp" target="_blank" rel="noopener" class="btn btn-whatsapp"><svg class="icon"><use href="#icon-chat"/></svg> Hablar con un asesor</a>
         <a href="#registro" class="btn btn-outline">Registrarme como distribuidor</a>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SALONES ALIADOS ============ -->
+<section class="section-pad salones-section" id="salones" style="background:#fff">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Red de salones aliados</span>
+      <h2>Encuentra tu Alisado Iónico D'Laurent</h2>
+      <p>Ubica el salón aliado más cercano por departamento y ciudad o municipio, y agenda tu cita directamente con ellos.</p>
+    </div>
+
+    <div class="founder-banner reveal-scale">
+      <div class="founder-banner-icon">🏆</div>
+      <div class="founder-banner-text">
+        <h3>Programa Salón Aliado Fundador</h3>
+        <p>Los primeros <strong>20 salones aliados</strong> de nuestro lanzamiento aparecerán en esta página como <strong>Salones Aliados Autorizados</strong> — con foto, ubicación y publicidad incluida en nuestras redes, totalmente gratis.</p>
+      </div>
+      <div class="founder-banner-count">
+        <span class="n" id="founderCount">0</span>
+        <span class="of">/ 20 cupos ocupados</span>
+      </div>
+      <a href="#registro" class="btn btn-gold btn-sm founder-banner-cta">Quiero ser Salón Fundador</a>
+    </div>
+
+    <div class="salones-filters reveal" id="salonesFilters" hidden>
+      <select id="filterDepto" aria-label="Filtrar por departamento"></select>
+      <select id="filterCiudad" aria-label="Filtrar por ciudad o municipio"></select>
+    </div>
+
+    <div class="salones-grid stagger" id="salonesGrid"></div>
+
+    <div class="salones-empty" id="salonesEmpty">
+      <div class="salones-empty-icon">📍</div>
+      <h3>Todavía no hay salones aliados publicados</h3>
+      <p>Estamos armando la red de Salones Aliados D'Laurent en toda Colombia. Si tienes un salón o eres estilista, sé de los primeros 20 fundadores y aparece aquí.</p>
+      <a href="#registro" class="btn btn-outline">Regístrate como distribuidor →</a>
     </div>
   </div>
 </section>
@@ -360,6 +464,7 @@
         <ul>
           <li><a href="#beneficios">Beneficios</a></li>
           <li><a href="#productos">Productos</a></li>
+          <li><a href="#salones">Salones Aliados</a></li>
           <li><a href="#testimonios">Testimonios</a></li>
           <li><a href="#registro">Distribuidores</a></li>
         </ul>

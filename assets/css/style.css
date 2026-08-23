@@ -361,6 +361,44 @@ header.site-header {
 .compare-col p.desc { color: rgba(255,255,255,.7); margin-top: 8px; font-size: 14px; }
 .compare-badge { position: absolute; top: -18px; right: -18px; background: var(--gold); color: var(--purple-950); font-weight: 800; padding: 10px 16px; border-radius: 50%; width: 84px; height: 84px; display:flex; align-items:center; justify-content:center; text-align:center; font-size: 13px; line-height:1.1; box-shadow: var(--shadow-gold); z-index: 2; transform: rotate(8deg); }
 
+/* ---------- Calculadora de rentabilidad ---------- */
+.calc-wrap {
+  display: grid; grid-template-columns: .95fr 1.05fr; gap: 0; border: 1.5px solid #eee2c8; border-radius: var(--radius-lg);
+  overflow: hidden; box-shadow: var(--shadow-soft);
+}
+.calc-inputs { background: var(--cream); padding: 44px 40px; display: flex; flex-direction: column; gap: 20px; }
+.calc-field { display: flex; flex-direction: column; gap: 8px; }
+.calc-field label { font-size: 13px; font-weight: 700; color: var(--purple-950); }
+.calc-field input {
+  background: #fff; border: 1.5px solid #e3d7ba; border-radius: var(--radius-sm); padding: 13px 15px;
+  font-size: 15px; font-family: inherit; color: var(--ink); transition: border-color .2s ease;
+}
+.calc-field input:focus { outline: none; border-color: var(--gold-dark); }
+.calc-hint { font-size: 12.5px; color: #8a8296; line-height: 1.6; margin-top: 4px; }
+
+.calc-results { background: var(--purple-950); padding: 44px 40px; color: #fff; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 30px; }
+.calc-results::before { content:''; position:absolute; inset:0; background: radial-gradient(circle at 90% 10%, rgba(201,169,97,.2), transparent 55%); pointer-events: none; }
+.calc-compare { display: flex; align-items: center; justify-content: space-between; gap: 14px; position: relative; z-index: 1; }
+.calc-col-r { text-align: center; flex: 1; }
+.calc-col-label { display: block; font-size: 11.5px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.55); margin-bottom: 8px; }
+.calc-big { font-family: var(--font-display); font-size: 44px; color: #fff; line-height: 1; font-variant-numeric: tabular-nums; }
+.calc-col-r.new .calc-big { color: var(--gold-light); }
+.calc-col-sub { display: block; font-size: 12px; color: rgba(255,255,255,.6); margin-top: 6px; }
+.calc-arrow { font-size: 20px; color: var(--gold); flex-shrink: 0; }
+.calc-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: rgba(255,255,255,.12); border-radius: var(--radius-md); overflow: hidden; position: relative; z-index: 1; }
+.calc-stat { background: rgba(255,255,255,.04); padding: 18px 14px; text-align: center; }
+.calc-stat .v { font-family: var(--font-mono, var(--font-display)); font-size: 19px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; }
+.calc-stat .l { font-size: 11px; color: rgba(255,255,255,.6); margin-top: 6px; line-height: 1.4; }
+.calc-stat.highlight { background: linear-gradient(140deg, rgba(201,169,97,.35), rgba(201,169,97,.12)); }
+.calc-stat.highlight .v { color: var(--gold-light); }
+.calc-results > .btn { position: relative; z-index: 1; }
+.calc-note { text-align: center; max-width: 760px; margin: 26px auto 0; font-size: 13.5px; color: #8a8296; line-height: 1.7; }
+
+@media (max-width: 860px) {
+  .calc-wrap { grid-template-columns: 1fr; }
+  .calc-inputs, .calc-results { padding: 34px 26px; }
+}
+
 /* ---------- Gallery ---------- */
 .gallery-tabs { display: flex; justify-content: center; gap: 12px; margin-bottom: 40px; flex-wrap: wrap; }
 .gallery-tab { padding: 10px 22px; border-radius: var(--radius-pill); border: 1.5px solid #e3d7ba; font-weight: 600; font-size: 13.5px; color: #6b6478; transition: all .25s ease; }
@@ -456,6 +494,65 @@ header.site-header {
 .cta-banner::before { content:''; position:absolute; inset:0; background: radial-gradient(circle at 10% 20%, rgba(201,169,97,.25), transparent 55%); }
 .cta-banner h3 { color: #fff; font-size: clamp(24px,3vw,32px); position: relative; z-index: 1; max-width: 480px; }
 .cta-banner .cta-actions { display: flex; gap: 14px; flex-wrap: wrap; position: relative; z-index: 1; }
+
+/* ---------- Salones aliados ---------- */
+.founder-banner {
+  display: flex; align-items: center; gap: 26px; flex-wrap: wrap;
+  background: linear-gradient(120deg, var(--purple-800), var(--purple-950));
+  border-radius: var(--radius-lg); padding: 32px 38px; margin-bottom: 44px; position: relative; overflow: hidden;
+  border: 1px solid rgba(201,169,97,.3);
+}
+.founder-banner::before { content:''; position:absolute; inset:0; background: radial-gradient(circle at 8% 20%, rgba(201,169,97,.28), transparent 55%); pointer-events: none; }
+.founder-banner-icon { font-size: 40px; flex-shrink: 0; position: relative; z-index: 1; }
+.founder-banner-text { flex: 1; min-width: 240px; position: relative; z-index: 1; }
+.founder-banner-text h3 { color: #fff; font-size: 19px; margin-bottom: 6px; }
+.founder-banner-text p { color: rgba(255,255,255,.72); font-size: 13.5px; line-height: 1.65; }
+.founder-banner-count { text-align: center; flex-shrink: 0; position: relative; z-index: 1; padding: 0 10px; }
+.founder-banner-count .n { display: block; font-family: var(--font-display); font-size: 32px; color: var(--gold-light); line-height: 1; }
+.founder-banner-count .of { display: block; font-size: 10.5px; color: rgba(255,255,255,.55); text-transform: uppercase; letter-spacing: .5px; margin-top: 4px; white-space: nowrap; }
+.founder-banner-cta { flex-shrink: 0; position: relative; z-index: 1; }
+
+.salones-filters { display: flex; gap: 14px; justify-content: center; margin-bottom: 34px; flex-wrap: wrap; }
+.salones-filters select {
+  background: #fff; border: 1.5px solid #e3d7ba; border-radius: var(--radius-pill); padding: 11px 20px;
+  font-size: 13.5px; font-weight: 600; color: var(--purple-950); font-family: inherit; min-width: 200px;
+}
+.salones-filters select:focus { outline: none; border-color: var(--gold-dark); }
+
+.salones-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+.salon-card {
+  background: #fff; border: 1px solid #efe6d6; border-radius: var(--radius-md); overflow: hidden;
+  transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+}
+.salon-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-soft); border-color: var(--gold); }
+.salon-map { height: 150px; background: var(--cream); position: relative; }
+.salon-map iframe { width: 100%; height: 100%; border: 0; display: block; filter: saturate(.9); }
+.salon-body { padding: 22px; }
+.salon-head { display: flex; gap: 12px; align-items: center; margin-bottom: 14px; }
+.salon-logo { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; background: var(--purple-950); flex-shrink: 0; }
+.salon-head h4 { font-size: 15.5px; color: var(--purple-950); display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.salon-loc { display: block; font-size: 12px; color: var(--gold-dark); font-weight: 600; margin-top: 2px; }
+.salon-badge {
+  display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 800; letter-spacing: .3px;
+  background: linear-gradient(120deg, var(--gold-light), var(--gold)); color: var(--purple-950); padding: 3px 9px; border-radius: 999px;
+}
+.salon-address { font-size: 13px; color: #6b6478; line-height: 1.6; margin-bottom: 16px; }
+.salon-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.salones-empty { display: none; text-align: center; max-width: 480px; margin: 0 auto; padding: 20px 20px 4px; }
+.salones-empty.show { display: block; }
+.salones-empty-icon { font-size: 38px; margin-bottom: 14px; }
+.salones-empty h3 { font-size: 19px; color: var(--purple-950); margin-bottom: 10px; }
+.salones-empty p { font-size: 14px; color: #8a8296; line-height: 1.65; margin-bottom: 22px; }
+
+@media (max-width: 900px) {
+  .salones-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .salones-grid { grid-template-columns: 1fr; }
+  .founder-banner { flex-direction: column; text-align: center; padding: 28px 24px; }
+  .founder-banner-count { padding: 6px 0; }
+}
 
 /* ---------- Footer ---------- */
 footer { background: var(--ink); color: rgba(255,255,255,.65); padding: 70px 0 24px; }
