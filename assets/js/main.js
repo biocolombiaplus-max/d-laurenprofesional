@@ -139,30 +139,71 @@
   }
 
   /* ---------------------------------------------------------------------
-     Countdown (launch offer)
+     Countdown (launch offer) — cajas de dígitos estilo cronómetro real
      --------------------------------------------------------------------- */
   function startCountdown() {
-    const el = document.getElementById("countdown");
-    if (!el) return;
+    const elD = document.getElementById("cdD");
+    const elH = document.getElementById("cdH");
+    const elM = document.getElementById("cdM");
+    const elS = document.getElementById("cdS");
+    const slide = document.querySelector('.topbar-slide[data-slide="0"]');
+    if (!elD || !elH || !elM || !elS) return;
     const end = new Date(SITE_CONFIG.launchOfferEndsAt).getTime();
+
+    function pad(n) {
+      return String(n).padStart(2, "0");
+    }
+
     function tick() {
-      const now = Date.now();
-      let diff = end - now;
+      const diff = end - Date.now();
       if (isNaN(end) || diff <= 0) {
-        el.textContent = "¡Consulta disponibilidad!";
+        if (slide) slide.hidden = true; // la oferta ya terminó: no mostrar un cronómetro falso
         return;
       }
       const d = Math.floor(diff / 86400000);
-      diff -= d * 86400000;
-      const h = Math.floor(diff / 3600000);
-      diff -= h * 3600000;
-      const m = Math.floor(diff / 60000);
-      diff -= m * 60000;
-      const s = Math.floor(diff / 1000);
-      el.textContent = `${d}d ${String(h).padStart(2, "0")}h ${String(m).padStart(2, "0")}m ${String(s).padStart(2, "0")}s`;
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      elD.textContent = pad(d);
+      elH.textContent = pad(h);
+      elM.textContent = pad(m);
+      elS.textContent = pad(s);
     }
     tick();
     setInterval(tick, 1000);
+  }
+
+  /* ---------------------------------------------------------------------
+     Barra de anuncios: rota entre urgencia, escasez, autoridad y
+     llamado a distribuidores — como en las marcas premium.
+     --------------------------------------------------------------------- */
+  function initTopbarTicker() {
+    const ticker = document.getElementById("topbarTicker");
+    if (!ticker) return;
+    const allSlides = Array.from(ticker.querySelectorAll(".topbar-slide"));
+    if (allSlides.length <= 1) return;
+    let timer;
+
+    function visibleSlides() {
+      return allSlides.filter((s) => !s.hidden);
+    }
+
+    function next() {
+      const slides = visibleSlides();
+      if (slides.length <= 1) return;
+      const current = slides.findIndex((s) => s.classList.contains("is-active"));
+      const nextIndex = (current + 1) % slides.length;
+      slides.forEach((s) => s.classList.remove("is-active"));
+      slides[nextIndex].classList.add("is-active");
+    }
+
+    function start() {
+      timer = setInterval(next, 4500);
+    }
+
+    start();
+    ticker.addEventListener("mouseenter", () => clearInterval(timer));
+    ticker.addEventListener("mouseleave", start);
   }
 
   /* ---------------------------------------------------------------------
@@ -791,6 +832,7 @@
     applySiteImages();
     wireWhatsappLinks();
     startCountdown();
+    initTopbarTicker();
     initReveal();
     initTimeBars();
     initCalculator();

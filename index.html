@@ -48,15 +48,39 @@
 </svg>
 
 <!-- ============ TOP BAR ============ -->
-<a href="#" id="topbarLink" target="_blank" rel="noopener" class="topbar">
-  <div class="container">
-    <span class="dot"></span>
-    <span>Únicos en Colombia con Alisado Iónico · Distribuidor Exclusivo Autorizado</span>
-    <span class="topbar-sep">·</span>
-    <span>Precio de lanzamiento termina en: <span id="countdown">--:--:--:--</span></span>
-    <span class="topbar-cta">Escríbenos ahora <svg class="icon" style="width:14px;height:14px"><use href="#icon-arrow"/></svg></span>
+<div class="topbar">
+  <div class="container topbar-inner">
+    <div class="topbar-ticker" id="topbarTicker">
+      <a href="#productos" class="topbar-slide is-active" data-slide="0">
+        <span class="dot"></span>
+        <span class="topbar-text tb-full">Precio de lanzamiento termina en</span>
+        <span class="topbar-text tb-short">Oferta termina en</span>
+        <span class="topbar-countdown">
+          <span class="cd-box"><b id="cdD">00</b><small>d</small></span>
+          <span class="cd-box"><b id="cdH">00</b><small>h</small></span>
+          <span class="cd-box"><b id="cdM">00</b><small>m</small></span>
+          <span class="cd-box"><b id="cdS">00</b><small>s</small></span>
+        </span>
+      </a>
+      <a href="#salones" class="topbar-slide" data-slide="1">
+        <span class="topbar-icon">🏆</span>
+        <span class="topbar-text tb-full"><strong>Cupos limitados</strong> — sé de los primeros 20 Salones Aliados Fundadores</span>
+        <span class="topbar-text tb-short"><strong>Cupos de Fundador</strong> limitados</span>
+      </a>
+      <a href="#beneficios" class="topbar-slide" data-slide="2">
+        <span class="topbar-icon">🌎</span>
+        <span class="topbar-text tb-full">Tecnología iónica ya reconocida en <strong>Venezuela y Ecuador</strong> — exclusiva en Colombia</span>
+        <span class="topbar-text tb-short">Única <strong>tecnología iónica</strong> en Colombia</span>
+      </a>
+      <a href="#registro" class="topbar-slide" data-slide="3">
+        <span class="topbar-icon">📦</span>
+        <span class="topbar-text tb-full">¿Tienes salón o eres estilista? <strong>Sé distribuidor autorizado</strong></span>
+        <span class="topbar-text tb-short"><strong>Sé distribuidor</strong> autorizado</span>
+      </a>
+    </div>
+    <a href="#" id="topbarLink" target="_blank" rel="noopener" class="topbar-cta">Escríbenos ahora <svg class="icon" style="width:14px;height:14px"><use href="#icon-arrow"/></svg></a>
   </div>
-</a>
+</div>
 
 <!-- ============ HEADER ============ -->
 <header class="site-header">

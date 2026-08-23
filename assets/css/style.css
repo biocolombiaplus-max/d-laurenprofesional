@@ -142,7 +142,6 @@ section { position: relative; }
   font-size: 13px;
   font-weight: 500;
   letter-spacing: .3px;
-  cursor: pointer;
   transition: background .25s ease;
   position: relative;
   overflow: hidden;
@@ -156,29 +155,47 @@ section { position: relative; }
   pointer-events: none;
 }
 @keyframes topbarSheen { 0%,100% { background-position: 130% 0; } 50% { background-position: -30% 0; } }
-.topbar:hover, .topbar:active { background: var(--purple-800); }
-.topbar .container {
+.topbar-inner {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 14px;
+  gap: 16px;
   padding: 9px 24px;
-  text-align: center;
-  flex-wrap: wrap;
   position: relative;
   z-index: 1;
 }
 .topbar .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); animation: blink 1.6s infinite; flex-shrink: 0; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
-.topbar #countdown { font-weight: 700; color: var(--white); letter-spacing: .5px; }
-.topbar-sep { opacity: .5; }
+
+/* Ticker: rota entre urgencia, escasez, autoridad y llamado a distribuidores */
+.topbar-ticker { position: relative; flex: 1; min-width: 0; height: 20px; }
+.topbar-slide {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 9px;
+  color: inherit; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  opacity: 0; transform: translateY(7px); transition: opacity .5s ease, transform .5s ease; pointer-events: none;
+}
+.topbar-slide.is-active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.topbar-slide:hover { color: var(--white); }
+.topbar-icon { flex-shrink: 0; font-size: 13px; }
+.topbar-text strong { color: var(--white); font-weight: 700; }
+.topbar-text.tb-short { display: none; }
+
+.topbar-countdown { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.cd-box {
+  display: flex; align-items: baseline; gap: 3px; background: rgba(255,255,255,.08);
+  border: 1px solid rgba(201,169,97,.35); border-radius: 5px; padding: 1px 6px;
+}
+.cd-box b { font-family: var(--font-display); font-size: 13.5px; color: var(--white); font-variant-numeric: tabular-nums; font-weight: 700; }
+.cd-box small { font-size: 9px; color: rgba(255,255,255,.55); text-transform: uppercase; }
+
 .topbar-cta {
+  flex-shrink: 0;
   display: inline-flex; align-items: center; gap: 5px;
   background: var(--gold); color: var(--purple-950); font-weight: 800;
-  padding: 3px 10px 3px 12px; border-radius: var(--radius-pill); font-size: 11.5px; letter-spacing: .2px;
+  padding: 5px 12px 5px 13px; border-radius: var(--radius-pill); font-size: 11.5px; letter-spacing: .2px;
   animation: pulseGlow 2.4s ease-in-out infinite;
+  transition: transform .2s ease;
 }
-.topbar:hover .topbar-cta { transform: translateX(2px); }
+.topbar-cta:hover { transform: translateX(2px); }
 
 /* ---------- Header ---------- */
 header.site-header {
@@ -728,6 +745,15 @@ footer { background: var(--ink); color: rgba(255,255,255,.65); padding: 70px 0 2
   /* Título de impacto primero, luego la foto, luego el resto de la información */
   .hero-visual { margin-top: 20px; margin-bottom: 24px; }
   .hero h1 { font-size: clamp(30px, 8vw, 40px); }
+
+  /* Barra de anuncios: textos cortos y sin CTA fija — el WhatsApp flotante ya cubre esa acción */
+  .topbar-inner { padding: 8px 14px; }
+  .topbar-cta { display: none; }
+  .topbar-text.tb-full { display: none; }
+  .topbar-text.tb-short { display: inline; }
+  .topbar-slide { font-size: 11.5px; gap: 6px; }
+  .cd-box { padding: 1px 5px; }
+  .cd-box b { font-size: 12.5px; }
 }
 
 @media (max-width: 480px) {
@@ -738,7 +764,6 @@ footer { background: var(--ink); color: rgba(255,255,255,.65); padding: 70px 0 2
   .nav-actions { gap: 8px; }
   #headerWhatsapp { display: none; }
   .icon-btn { width: 38px; height: 38px; }
-  .topbar .container { padding: 8px 16px; font-size: 11.5px; gap: 8px; }
 }
 
 /* Mobile nav drawer */
