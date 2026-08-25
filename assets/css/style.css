@@ -285,7 +285,7 @@ header.site-header {
 }
 .hero-badge--ion::before { display: none; }
 .hero h1 { grid-area: title; font-size: clamp(38px, 5.4vw, 64px); letter-spacing: .2px; }
-.hero h1 .accent { color: var(--gold); font-style: italic; white-space: nowrap; }
+.hero h1 .accent { color: var(--gold); font-style: italic; }
 .hero .lead { grid-area: lead; margin-top: 22px; font-size: 18px; line-height: 1.65; color: rgba(255,255,255,.82); max-width: 540px; }
 .hero-stats { grid-area: stats; display: flex; gap: 34px; margin-top: 38px; }
 .hero-stats .stat b { display: block; font-family: var(--font-display); font-size: 30px; color: var(--gold-light); }

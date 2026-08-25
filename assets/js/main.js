@@ -253,7 +253,7 @@
     const elDias = document.getElementById("calcDias");
     if (!elServicios || !elPrecio || !elDias) return;
 
-    const TIME_FACTOR = 0.3; // el alisado iónico toma hasta 70% menos tiempo
+    const TIME_FACTOR = 0.3; // el alisado iónico de última generación toma hasta 70% menos tiempo
 
     function compute() {
       const servicios = Math.max(0, Number(elServicios.value) || 0);
@@ -329,7 +329,7 @@
     const q = encodeURIComponent(salonMapsQuery(s));
     const embedSrc = `https://www.google.com/maps?q=${q}&output=embed`;
     const viewUrl = `https://www.google.com/maps/search/?api=1&query=${q}`;
-    const waMsg = encodeURIComponent(`Hola, vi ${s.nombre} como Salón Aliado D'Laurent y quiero agendar mi alisado iónico.`);
+    const waMsg = encodeURIComponent(`Hola, vi ${s.nombre} como Salón Aliado D'Laurent y quiero agendar mi alisado iónico de última generación.`);
     const waHref = s.whatsapp ? `https://wa.me/${s.whatsapp}?text=${waMsg}` : "";
     const logoHtml = s.logo
       ? `<img class="salon-logo" src="${s.logo}" alt="">`
