@@ -128,6 +128,7 @@
         document.getElementById("tabBenefits").hidden = tab !== "benefits";
         document.getElementById("tabProducts").hidden = tab !== "products";
         document.getElementById("tabSalones").hidden = tab !== "salones";
+        document.getElementById("tabCrm").hidden = tab !== "crm";
       });
     });
   }
@@ -1075,6 +1076,190 @@
     document.getElementById("cancelEditSalon").addEventListener("click", resetSalonForm);
   }
 
+  /* =======================================================================
+     TAB 6 — CRM (leads de la Reunión Virtual)
+     ======================================================================= */
+  const STATUS_LABELS = {
+    nuevo: "Nuevo",
+    contactado: "Contactado",
+    confirmado: "Confirmado",
+    asistio: "Asistió",
+    no_asistio: "No asistió",
+  };
+  let crmLeads = [];
+  let crmError = "";
+  const crmNotesTimers = {};
+
+  async function loadCrmLeads() {
+    if (!supabaseClient) return [];
+    try {
+      const { data, error } = await supabaseClient
+        .from("webinar_registrations")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      crmError = "";
+      return data || [];
+    } catch (e) {
+      console.warn("No se pudo leer el CRM. ¿Ya creaste la tabla webinar_registrations? Revisa el README.", e);
+      crmError = "No se pudo cargar el CRM. Si es la primera vez, revisa el README: falta ejecutar el script SQL de la Reunión Virtual en Supabase.";
+      return [];
+    }
+  }
+
+  function renderCrmStats(leads) {
+    const el = document.getElementById("crmStats");
+    const counts = { nuevo: 0, contactado: 0, confirmado: 0, asistio: 0, no_asistio: 0 };
+    leads.forEach((l) => {
+      if (counts[l.status] != null) counts[l.status] += 1;
+    });
+    const tiles = [
+      { l: "Total", n: leads.length },
+      { l: "Nuevos", n: counts.nuevo },
+      { l: "Contactados", n: counts.contactado },
+      { l: "Confirmados", n: counts.confirmado },
+      { l: "Asistieron", n: counts.asistio },
+    ];
+    el.innerHTML = tiles.map((t) => `<div class="crm-stat"><div class="n">${t.n}</div><div class="l">${t.l}</div></div>`).join("");
+  }
+
+  function crmWaLink(lead) {
+    const phone = (lead.whatsapp || "").replace(/[^0-9]/g, "");
+    const fullPhone = phone.startsWith("57") ? phone : `57${phone}`;
+    const msg = encodeURIComponent(
+      `Hola ${lead.nombre} 👋, soy de D'Laurent Professional. Te escribo por tu registro a la Reunión Virtual del ${lead.day} (${lead.session_date}).`
+    );
+    return `https://wa.me/${fullPhone}?text=${msg}`;
+  }
+
+  function filteredCrmLeads() {
+    const q = document.getElementById("crmSearch").value.trim().toLowerCase();
+    const statusF = document.getElementById("crmFilterStatus").value;
+    const dayF = document.getElementById("crmFilterDay").value;
+    return crmLeads.filter((l) => {
+      if (statusF !== "todos" && l.status !== statusF) return false;
+      if (dayF !== "todos" && l.day !== dayF) return false;
+      if (q) {
+        const hay = `${l.nombre} ${l.correo} ${l.whatsapp}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+  }
+
+  function renderCrmTable() {
+    const body = document.getElementById("crmTableBody");
+    const empty = document.getElementById("crmEmpty");
+    const list = filteredCrmLeads();
+
+    if (crmError) {
+      body.innerHTML = "";
+      empty.hidden = false;
+      empty.textContent = crmError;
+      return;
+    }
+    if (list.length === 0) {
+      body.innerHTML = "";
+      empty.hidden = false;
+      empty.textContent = crmLeads.length === 0 ? "Aún no hay registros de la Reunión Virtual." : "Ningún registro coincide con el filtro.";
+      return;
+    }
+    empty.hidden = true;
+
+    body.innerHTML = list
+      .map((l) => {
+        const created = l.created_at ? new Date(l.created_at).toLocaleDateString("es-CO", { day: "numeric", month: "short", year: "numeric" }) : "";
+        const sessionDate = l.session_date ? new Date(l.session_date + "T00:00:00").toLocaleDateString("es-CO", { day: "numeric", month: "short" }) : "";
+        return `
+        <tr data-id="${l.id}">
+          <td>
+            <div class="crm-contact">
+              <div class="name">${escapeHtml(l.nombre)}</div>
+              <div class="sub">${escapeHtml(l.correo)} · <a href="${crmWaLink(l)}" target="_blank" rel="noopener">WhatsApp ↗</a></div>
+            </div>
+          </td>
+          <td class="crm-session"><span class="badge">${escapeHtml(l.day || "")}</span><span class="date">${sessionDate}</span></td>
+          <td>
+            <select class="status-select st-${l.status}" data-status-for="${l.id}">
+              ${Object.keys(STATUS_LABELS).map((s) => `<option value="${s}" ${s === l.status ? "selected" : ""}>${STATUS_LABELS[s]}</option>`).join("")}
+            </select>
+          </td>
+          <td><input type="text" class="crm-notes" data-notes-for="${l.id}" value="${escapeHtml(l.notes || "")}" placeholder="Notas de seguimiento…"></td>
+          <td class="reg-date">${created}</td>
+        </tr>`;
+      })
+      .join("");
+
+    body.querySelectorAll("[data-status-for]").forEach((sel) => {
+      sel.addEventListener("change", async () => {
+        const id = sel.dataset.statusFor;
+        const newStatus = sel.value;
+        sel.className = `status-select st-${newStatus}`;
+        const lead = crmLeads.find((l) => l.id === id);
+        if (lead) lead.status = newStatus;
+        try {
+          const { error } = await supabaseClient.from("webinar_registrations").update({ status: newStatus }).eq("id", id);
+          if (error) throw error;
+          renderCrmStats(crmLeads);
+        } catch (e) {
+          console.error(e);
+          showToast("No se pudo actualizar el estado. Inténtalo de nuevo.");
+        }
+      });
+    });
+
+    body.querySelectorAll("[data-notes-for]").forEach((input) => {
+      input.addEventListener("input", () => {
+        const id = input.dataset.notesFor;
+        clearTimeout(crmNotesTimers[id]);
+        crmNotesTimers[id] = setTimeout(async () => {
+          const lead = crmLeads.find((l) => l.id === id);
+          if (lead) lead.notes = input.value;
+          try {
+            const { error } = await supabaseClient.from("webinar_registrations").update({ notes: input.value }).eq("id", id);
+            if (error) throw error;
+          } catch (e) {
+            console.error(e);
+            showToast("No se pudo guardar la nota. Inténtalo de nuevo.");
+          }
+        }, 600);
+      });
+    });
+  }
+
+  function exportCrmCsv() {
+    const list = filteredCrmLeads();
+    if (list.length === 0) {
+      showToast("No hay registros para exportar");
+      return;
+    }
+    const headers = ["nombre", "correo", "whatsapp", "day", "session_date", "status", "notes", "created_at"];
+    const rows = list.map((l) => headers.map((h) => `"${String(l[h] ?? "").replace(/"/g, '""')}"`).join(","));
+    const csv = [headers.join(","), ...rows].join("\r\n");
+    const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `crm-dlaurent-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }
+
+  function initCrm() {
+    document.getElementById("crmSearch").addEventListener("input", renderCrmTable);
+    document.getElementById("crmFilterStatus").addEventListener("change", renderCrmTable);
+    document.getElementById("crmFilterDay").addEventListener("change", renderCrmTable);
+    document.getElementById("crmExportBtn").addEventListener("click", exportCrmCsv);
+    document.getElementById("crmRefreshBtn").addEventListener("click", async () => {
+      crmLeads = await loadCrmLeads();
+      renderCrmStats(crmLeads);
+      renderCrmTable();
+      showToast("CRM actualizado");
+    });
+  }
+
   /* ---------------------------------------------------------------------
      Init
      --------------------------------------------------------------------- */
@@ -1105,6 +1290,11 @@
     initSalonesForm();
     renderSalonesManageList();
     renderSalonesPreview();
+
+    initCrm();
+    crmLeads = await loadCrmLeads();
+    renderCrmStats(crmLeads);
+    renderCrmTable();
 
     setSaveStatus("ok");
   }

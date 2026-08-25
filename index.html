@@ -399,7 +399,50 @@
       <span class="eyebrow">Únete a la red D'Laurent</span>
       <h2>Capacitación gratuita o precios de distribuidor</h2>
       <p>Regístrate y un asesor te contactará por WhatsApp para coordinar tu capacitación virtual o tus precios especiales al por mayor.</p>
-      <a href="assets/docs/instructivo-aplicacion-dlaurent.pdf" target="_blank" rel="noopener" class="btn btn-outline btn-sm" style="margin-top:20px">📄 Descargar instructivo técnico de aplicación (PDF)</a>
+      <a href="assets/docs/instructivo-aplicacion-dlaurent.pdf" target="_blank" rel="noopener" class="btn btn-outline btn-sm pdf-download-btn" style="margin-top:20px">📄 Descargar instructivo técnico de aplicación (PDF)</a>
+    </div>
+
+    <!-- ---------- REUNIÓN VIRTUAL SEMANAL ---------- -->
+    <div class="webinar-card reveal-scale" id="webinarCard">
+      <div class="webinar-head">
+        <span class="webinar-eyebrow">📅 Reunión virtual en vivo · Cupo limitado</span>
+        <h3>Conoce el negocio D'Laurent en 1 hora</h3>
+        <p>Producto, precios, modelo de distribución, ganancias reales y todo lo que debes saber para decidir con seguridad — en una videollamada en vivo, sin costo.</p>
+      </div>
+
+      <div class="webinar-days" id="webinarDays">
+        <button type="button" class="webinar-day" data-day="martes">
+          <span class="wd-top"><span class="wd-name">Martes</span><span class="wd-time">8:00 – 9:00 a.m.</span></span>
+          <span class="wd-spots" id="spots-martes">Consultando cupos…</span>
+        </button>
+        <button type="button" class="webinar-day" data-day="jueves">
+          <span class="wd-top"><span class="wd-name">Jueves</span><span class="wd-time">8:00 – 9:00 a.m.</span></span>
+          <span class="wd-spots" id="spots-jueves">Consultando cupos…</span>
+        </button>
+      </div>
+
+      <form class="webinar-form" id="webinarForm" hidden>
+        <p class="webinar-selected" id="webinarSelectedLabel"></p>
+        <div class="form-row">
+          <div class="field"><label>Nombre completo</label><input type="text" name="nombre" placeholder="Tu nombre completo" required></div>
+          <div class="field"><label>WhatsApp</label><input type="tel" name="whatsapp" placeholder="Ej: 3001234567" required></div>
+        </div>
+        <div class="form-row">
+          <div class="field full"><label>Correo electrónico</label><input type="email" name="correo" placeholder="tucorreo@email.com" required></div>
+        </div>
+        <button type="submit" class="btn btn-gold btn-block">Confirmar mi cupo →</button>
+        <p class="form-note" id="webinarFormNote">Tu cupo queda reservado al instante. Te enviaremos la confirmación y el enlace de la videollamada.</p>
+      </form>
+
+      <div class="webinar-success" id="webinarSuccess">
+        <div class="check">✓</div>
+        <h4>¡Cupo confirmado!</h4>
+        <p id="webinarSuccessDetail"></p>
+        <div class="webinar-success-actions">
+          <a href="#" id="webinarIcsBtn" download="reunion-dlaurent.ics" class="btn btn-outline btn-sm">📅 Agregar a mi calendario</a>
+          <a href="#" id="webinarWaBtn" target="_blank" rel="noopener" class="btn btn-whatsapp btn-sm">Confirmar por WhatsApp</a>
+        </div>
+      </div>
     </div>
 
     <div class="form-wrap reveal-scale">

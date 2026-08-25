@@ -34,6 +34,13 @@ const SITE_CONFIG = {
   facebook: "#",
   launchOfferEndsAt: "2026-09-30T23:59:59-05:00", // ajusta la fecha real de tu oferta de lanzamiento
   city: "Colombia",
+  webinar: {
+    days: ["martes", "jueves"], // reunión virtual semanal — puedes dejar solo uno o agregar más días
+    startHour: 8, // 24h — hora de inicio
+    endHour: 9, // 24h — hora de fin
+    timeLabel: "8:00 – 9:00 a.m.",
+    capacity: 10, // debe coincidir con el límite configurado en la base de datos (ver README)
+  },
 };
 
 /* PRODUCTS: contenido de respaldo. Ahora puedes agregar, editar, eliminar y
@@ -130,7 +137,7 @@ const FAQS = [
   },
   {
     q: "¿Cuánto dura realmente el proceso?",
-    a: "Gracias a la fórmula profesional, el proceso completo puede tomar 1 hora o menos, frente a las 4-5 horas de un alisado tradicional, permitiendo atender más clientas por jornada.",
+    a: "Depende del calibre de la fibra y el nivel de rizo de cada cabello. En cabello liso, ondulado o con rizo moderado, el proceso completo toma 1 hora o menos. En cabello de rizo muy cerrado y marcado — como el cabello afro o de textura muy rizada — puede tomar hasta 2 horas como máximo. En ambos casos, muy por debajo de las 4-5 horas de un alisado tradicional, permitiendo atender más clientas por jornada.",
   },
   {
     q: "¿Tiene amoniaco o químicos agresivos?",

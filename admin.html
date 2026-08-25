@@ -81,6 +81,7 @@
     <button class="admin-tab" data-tab="benefits">🏅 Íconos de beneficios</button>
     <button class="admin-tab" data-tab="products">🛍️ Productos (Tienda)</button>
     <button class="admin-tab" data-tab="salones">📍 Salones Aliados</button>
+    <button class="admin-tab" data-tab="crm">📇 CRM</button>
   </nav>
 
   <main class="admin-grid" id="tabGallery">
@@ -262,6 +263,53 @@
     <section class="admin-card admin-card-wide">
       <h2>Vista previa — así se ve en tu landing</h2>
       <div class="product-grid" id="productsPreviewGrid" style="margin-top:18px"></div>
+    </section>
+  </main>
+
+  <!-- ============ TAB: CRM ============ -->
+  <main class="admin-grid" id="tabCrm" hidden>
+    <section class="admin-card admin-card-wide">
+      <div class="admin-card-head">
+        <h2>CRM — Leads de la Reunión Virtual</h2>
+        <button class="btn btn-outline btn-sm" id="crmExportBtn" style="color:var(--purple-800);border-color:var(--purple-800)">⬇ Exportar CSV</button>
+      </div>
+      <p class="admin-hint">Cada persona que reserva un cupo en la Reunión Virtual queda registrada aquí. Actualiza el estado a medida que avanzas la conversación para hacer remarketing fácil, como en un CRM real.</p>
+
+      <div class="crm-stats" id="crmStats"></div>
+
+      <div class="crm-filters">
+        <input type="text" id="crmSearch" placeholder="Buscar por nombre, correo o WhatsApp…">
+        <select id="crmFilterStatus">
+          <option value="todos">Todos los estados</option>
+          <option value="nuevo">Nuevo</option>
+          <option value="contactado">Contactado</option>
+          <option value="confirmado">Confirmado</option>
+          <option value="asistio">Asistió</option>
+          <option value="no_asistio">No asistió</option>
+        </select>
+        <select id="crmFilterDay">
+          <option value="todos">Todos los días</option>
+          <option value="martes">Martes</option>
+          <option value="jueves">Jueves</option>
+        </select>
+        <button class="admin-link-btn" id="crmRefreshBtn" style="color:var(--gold-dark)">↻ Actualizar</button>
+      </div>
+
+      <div class="crm-table-wrap">
+        <table class="crm-table" id="crmTable">
+          <thead>
+            <tr>
+              <th>Contacto</th>
+              <th>Sesión</th>
+              <th>Estado</th>
+              <th>Notas</th>
+              <th>Registrado</th>
+            </tr>
+          </thead>
+          <tbody id="crmTableBody"></tbody>
+        </table>
+      </div>
+      <div class="admin-manage-empty" id="crmEmpty" hidden>Aún no hay registros de la Reunión Virtual.</div>
     </section>
   </main>
 

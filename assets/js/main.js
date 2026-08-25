@@ -787,6 +787,204 @@
   }
 
   /* ---------------------------------------------------------------------
+     Reunión virtual semanal (webinar de oportunidad de negocio)
+     --------------------------------------------------------------------- */
+  const WEEKDAY_INDEX = { domingo: 0, lunes: 1, martes: 2, "miércoles": 3, jueves: 4, viernes: 5, "sábado": 6 };
+
+  function nextSessionDate(dayName) {
+    const targetIdx = WEEKDAY_INDEX[dayName];
+    const now = new Date();
+    let diff = (targetIdx - now.getDay() + 7) % 7;
+    const endHour = (SITE_CONFIG.webinar && SITE_CONFIG.webinar.endHour) || 9;
+    if (diff === 0 && now.getHours() >= endHour) diff = 7;
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate() + diff);
+  }
+
+  function isoDateOnly(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
+
+  function formatSessionDate(d) {
+    return d.toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long" });
+  }
+
+  function icsUtcStamp(y, m, d, hour, minute) {
+    // Bogotá es UTC-05:00 todo el año (no tiene horario de verano)
+    const dt = new Date(Date.UTC(y, m - 1, d, hour + 5, minute || 0, 0));
+    return dt.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  }
+
+  function buildWebinarIcs(date) {
+    const cfg = SITE_CONFIG.webinar || { startHour: 8, endHour: 9 };
+    const y = date.getFullYear();
+    const m = date.getMonth() + 1;
+    const d = date.getDate();
+    const start = icsUtcStamp(y, m, d, cfg.startHour, 0);
+    const end = icsUtcStamp(y, m, d, cfg.endHour, 0);
+    const now = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    const uid = `webinar-${y}${m}${d}-${Math.random().toString(36).slice(2, 8)}@dlaurentprofessional`;
+    const lines = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//D'Laurent Professional//Reunion Virtual//ES",
+      "CALSCALE:GREGORIAN",
+      "BEGIN:VEVENT",
+      `UID:${uid}`,
+      `DTSTAMP:${now}`,
+      `DTSTART:${start}`,
+      `DTEND:${end}`,
+      "SUMMARY:Reunión virtual D'Laurent Professional",
+      "DESCRIPTION:Conoce el negocio D'Laurent: producto\\, precios\\, modelo de distribución y ganancias reales. Te enviaremos el enlace de la videollamada por WhatsApp antes de la sesión.",
+      "LOCATION:Videollamada (enlace por WhatsApp)",
+      "BEGIN:VALARM",
+      "TRIGGER:-PT1H",
+      "ACTION:DISPLAY",
+      "DESCRIPTION:Tu reunión D'Laurent Professional empieza en 1 hora",
+      "END:VALARM",
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ];
+    return lines.join("\r\n");
+  }
+
+  function initWebinar() {
+    const card = document.getElementById("webinarCard");
+    if (!card) return;
+
+    const cfg = SITE_CONFIG.webinar || { days: ["martes", "jueves"], capacity: 10, timeLabel: "" };
+    const capacity = cfg.capacity || 10;
+    const dayButtons = Array.from(card.querySelectorAll(".webinar-day"));
+    const form = document.getElementById("webinarForm");
+    const successEl = document.getElementById("webinarSuccess");
+    const selectedLabel = document.getElementById("webinarSelectedLabel");
+    let selectedDay = null;
+    let selectedDate = null;
+    const sessionDates = {};
+
+    dayButtons.forEach((btn) => {
+      sessionDates[btn.dataset.day] = nextSessionDate(btn.dataset.day);
+    });
+
+    async function refreshSpots() {
+      for (const btn of dayButtons) {
+        const day = btn.dataset.day;
+        const spotsEl = btn.querySelector(".wd-spots");
+        if (!supabaseClient) {
+          spotsEl.textContent = "Cupos limitados";
+          continue;
+        }
+        try {
+          const { data, error } = await supabaseClient.rpc("get_webinar_spots", {
+            p_day: day,
+            p_session_date: isoDateOnly(sessionDates[day]),
+          });
+          if (error) throw error;
+          const taken = data || 0;
+          const remaining = Math.max(0, capacity - taken);
+          spotsEl.classList.remove("low", "full");
+          if (remaining <= 0) {
+            spotsEl.textContent = "Cupo agotado";
+            spotsEl.classList.add("full");
+            btn.classList.add("is-full");
+          } else {
+            btn.classList.remove("is-full");
+            spotsEl.textContent = taken > 0 ? `${taken} inscritos · quedan ${remaining}` : `Quedan ${remaining} cupos`;
+            if (remaining <= 3) spotsEl.classList.add("low");
+          }
+        } catch (err) {
+          console.warn("No se pudo consultar cupos del webinar, mostrando mensaje genérico.", err);
+          spotsEl.textContent = "Cupos limitados";
+        }
+      }
+    }
+
+    function selectDay(day) {
+      const btn = dayButtons.find((b) => b.dataset.day === day);
+      if (btn && btn.classList.contains("is-full")) return;
+      selectedDay = day;
+      selectedDate = sessionDates[day];
+      dayButtons.forEach((b) => b.classList.toggle("is-selected", b.dataset.day === day));
+      selectedLabel.textContent = `Reservando tu cupo para el ${formatSessionDate(selectedDate)}, ${cfg.timeLabel || ""}`;
+      form.hidden = false;
+      successEl.classList.remove("show");
+    }
+
+    dayButtons.forEach((btn) => btn.addEventListener("click", () => selectDay(btn.dataset.day)));
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!selectedDay || !selectedDate) return;
+      const data = Object.fromEntries(new FormData(form).entries());
+      const submitBtn = form.querySelector("button[type=submit]");
+      submitBtn.disabled = true;
+
+      const registration = {
+        day: selectedDay,
+        session_date: isoDateOnly(selectedDate),
+        nombre: data.nombre,
+        correo: data.correo,
+        whatsapp: data.whatsapp,
+      };
+
+      let capacityFull = false;
+      if (supabaseClient) {
+        try {
+          const { error } = await supabaseClient.from("webinar_registrations").insert(registration);
+          if (error) {
+            if (/cupo lleno/i.test(error.message || "")) {
+              capacityFull = true;
+            } else {
+              throw error;
+            }
+          }
+        } catch (err) {
+          console.error(err);
+          showToast("No se pudo confirmar el cupo. Inténtalo de nuevo o escríbenos por WhatsApp.");
+          submitBtn.disabled = false;
+          return;
+        }
+      }
+
+      if (capacityFull) {
+        showToast("Ese cupo se acaba de agotar. Elige el otro día 🙌");
+        await refreshSpots();
+        form.hidden = true;
+        dayButtons.forEach((b) => b.classList.remove("is-selected"));
+        submitBtn.disabled = false;
+        return;
+      }
+
+      try {
+        const leads = JSON.parse(localStorage.getItem("dlaurent_leads") || "[]");
+        leads.push({ tipo: "Reunión virtual", ...registration, fecha: new Date().toISOString() });
+        localStorage.setItem("dlaurent_leads", JSON.stringify(leads));
+      } catch (err) {
+        /* localStorage no disponible: continuar sin bloquear el envío */
+      }
+
+      const icsContent = buildWebinarIcs(selectedDate);
+      const icsBlob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+      document.getElementById("webinarIcsBtn").href = URL.createObjectURL(icsBlob);
+
+      const waMsg = `Hola D'Laurent Professional 👋, confirmé mi cupo para la reunión virtual del ${formatSessionDate(selectedDate)} (${cfg.timeLabel || ""}). Mi nombre es ${data.nombre}.`;
+      document.getElementById("webinarWaBtn").href = waLink(waMsg);
+      document.getElementById("webinarSuccessDetail").textContent =
+        `Tu cupo para el ${formatSessionDate(selectedDate)}, ${cfg.timeLabel || ""}, quedó reservado. Te contactaremos por WhatsApp con el enlace de la videollamada.`;
+
+      form.hidden = true;
+      successEl.classList.add("show");
+      form.reset();
+      submitBtn.disabled = false;
+      await refreshSpots();
+    });
+
+    refreshSpots();
+  }
+
+  /* ---------------------------------------------------------------------
      Gallery: render, filter by category, lightbox
      --------------------------------------------------------------------- */
   let galleryFiltered = GALLERY.slice();
@@ -845,6 +1043,7 @@
     renderTestimonials();
     renderFaq();
     initForms();
+    initWebinar();
     initGallery();
     initHeaderScroll();
 

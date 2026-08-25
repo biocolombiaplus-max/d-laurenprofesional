@@ -112,6 +112,45 @@
 .admin-instructions li { font-size: 14.5px; color: #514b60; line-height: 1.6; }
 .admin-instructions code { background: #f3ede0; padding: 1px 7px; border-radius: 4px; font-size: 13px; color: var(--purple-950); }
 
+/* ---------- CRM ---------- */
+.crm-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin: 20px 0; }
+.crm-stat { background: #faf6ea; border: 1px solid #eee2c8; border-radius: var(--radius-sm); padding: 14px; text-align: center; }
+.crm-stat .n { font-family: var(--font-display); font-size: 24px; color: var(--purple-950); }
+.crm-stat .l { font-size: 10.5px; color: #a89f78; text-transform: uppercase; letter-spacing: .4px; margin-top: 4px; }
+.crm-filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
+.crm-filters input[type="text"] {
+  flex: 1; min-width: 200px; padding: 10px 14px; border-radius: var(--radius-sm); border: 1.5px solid #e3d7ba; font-size: 13.5px; font-family: inherit;
+}
+.crm-filters select { padding: 10px 12px; border-radius: var(--radius-sm); border: 1.5px solid #e3d7ba; font-size: 13px; font-family: inherit; background: #fff; }
+.crm-table-wrap { overflow-x: auto; border: 1px solid #eee2c8; border-radius: var(--radius-sm); }
+.crm-table { width: 100%; border-collapse: collapse; min-width: 720px; }
+.crm-table th {
+  text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .4px; color: #a89f78;
+  padding: 12px 14px; background: #faf6ea; border-bottom: 1px solid #eee2c8; white-space: nowrap;
+}
+.crm-table td { padding: 12px 14px; border-bottom: 1px solid #f3ede0; vertical-align: top; font-size: 13.5px; }
+.crm-table tr:last-child td { border-bottom: none; }
+.crm-contact .name { font-weight: 700; color: var(--purple-950); }
+.crm-contact .sub { font-size: 12px; color: #8a8296; margin-top: 2px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.crm-contact .sub a { color: var(--success); font-weight: 700; }
+.crm-session { white-space: nowrap; }
+.crm-session .badge { display: inline-block; font-size: 10.5px; font-weight: 700; text-transform: capitalize; background: #f3ede0; color: var(--purple-950); padding: 2px 8px; border-radius: 999px; margin-bottom: 3px; }
+.crm-session .date { display: block; font-size: 11.5px; color: #a89f78; }
+.crm-table select.status-select {
+  padding: 6px 8px; border-radius: 6px; border: 1.5px solid #e3d7ba; font-size: 12.5px; font-weight: 700; font-family: inherit; min-width: 130px;
+}
+.status-select.st-nuevo { color: #7a5b12; border-color: #f0e2ad; background: #fff8e5; }
+.status-select.st-contactado { color: #1f5fa8; border-color: #bcd7f5; background: #eaf3ff; }
+.status-select.st-confirmado { color: #1f7a4c; border-color: #b8e3c9; background: #eafbf1; }
+.status-select.st-asistio { color: #6b3fa0; border-color: #ddc9f0; background: #f6efff; }
+.status-select.st-no_asistio { color: #a83a3a; border-color: #f0c9c9; background: #fdeeee; }
+.crm-notes { width: 100%; min-width: 160px; padding: 6px 8px; border-radius: 6px; border: 1.5px solid #e3d7ba; font-size: 12.5px; font-family: inherit; }
+.crm-table .reg-date { font-size: 12px; color: #a89f78; white-space: nowrap; }
+
+@media (max-width: 700px) {
+  .crm-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
 @media (max-width: 900px) {
   .admin-grid { grid-template-columns: 1fr; }
 }

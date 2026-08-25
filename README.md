@@ -68,6 +68,43 @@ El panel en **`admin.html`** está conectado a [Supabase](https://supabase.com/)
 3. Ve a **Authentication → Users** → "Add user" → pon tu correo y una contraseña → activa **"Auto Confirm User"** → Create user. Ese será tu login del panel.
 4. Ve a ⚙️ **Project Settings → API** → copia el "Project URL" y la llave "anon public".
 5. Pega esos 2 valores en `assets/js/supabase-config.js` (reemplaza los `"TU_..."`).
+6. **Solo si quieres activar la Reunión Virtual semanal y el CRM** (ver más abajo): en el mismo **SQL Editor**, pega y ejecuta también este segundo script — crea la tabla de registros, la función que cuenta los cupos disponibles sin exponer datos de contacto al público, y el límite real de 10 cupos por sesión:
+
+   ```sql
+   create table if not exists webinar_registrations (
+     id uuid primary key default gen_random_uuid(),
+     created_at timestamptz not null default now(),
+     day text not null check (day in ('martes','jueves')),
+     session_date date not null,
+     nombre text not null,
+     correo text not null,
+     whatsapp text not null,
+     status text not null default 'nuevo',
+     notes text not null default ''
+   );
+   alter table webinar_registrations enable row level security;
+   create policy "Public can register for webinars" on webinar_registrations for insert with check (true);
+   create policy "Authenticated can view registrations" on webinar_registrations for select using (auth.role() = 'authenticated');
+   create policy "Authenticated can update registrations" on webinar_registrations for update using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+   create or replace function get_webinar_spots(p_day text, p_session_date date)
+   returns integer language sql security definer set search_path = public as $$
+     select count(*)::int from webinar_registrations where day = p_day and session_date = p_session_date;
+   $$;
+   grant execute on function get_webinar_spots(text, date) to anon, authenticated;
+
+   create or replace function enforce_webinar_capacity()
+   returns trigger language plpgsql security definer as $$
+   begin
+     if (select count(*) from webinar_registrations where day = new.day and session_date = new.session_date) >= 10 then
+       raise exception 'Cupo lleno para esta sesión';
+     end if;
+     return new;
+   end;
+   $$;
+   drop trigger if exists trg_webinar_capacity on webinar_registrations;
+   create trigger trg_webinar_capacity before insert on webinar_registrations for each row execute function enforce_webinar_capacity();
+   ```
 
 Mientras `supabase-config.js` tenga los valores de fábrica (`"TU_SUPABASE_URL"`, etc.), el sitio sigue funcionando normal con el contenido local de `gallery-data.js` y `site-images.js`, y `admin.html` muestra un aviso de "panel no conectado" en vez del login — no se rompe nada por no tenerlo configurado todavía.
 
