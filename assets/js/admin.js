@@ -716,12 +716,13 @@
               ${hasDiscount ? `<span class="price-compare">${fmtPriceAdmin(p.comparePrice, currency)}</span>` : ""}
               <span class="price-now">${fmtPriceAdmin(p.price, currency)}${hasDiscount ? `<span class="price-discount-chip">-${discountPct}%</span>` : ""}</span>
               <small>${hasDiscount ? "precio especial por tiempo limitado" : "precio de lanzamiento"}</small>
-              ${currency !== "COP" ? `<span class="product-currency-note">Precio en ${currency}</span>` : ""}`;
+              ${currency !== "COP" ? `<span class="product-currency-note">Precio en ${currency}</span>` : ""}
+              ${hasDiscount ? `<span class="launch-offer-tag">Oferta de lanzamiento · primeros 20 clientes</span>` : ""}`;
         return `
         <div class="product-card">
           <div class="product-media">
             ${p.badge ? `<span class="product-badge">${escapeHtml(p.badge)}</span>` : ""}
-            ${hasDiscount ? `<span class="product-offer-badge"><b>-${discountPct}%</b><span>Oferta</span></span>` : ""}
+            ${hasDiscount ? `<span class="product-offer-badge"><b>-${discountPct}%</b><span>Lanzamiento</span></span>` : ""}
             <img src="${p.image || ""}" alt="${escapeHtml(p.name)}">
           </div>
           <div class="product-body">

@@ -485,20 +485,28 @@ header.site-header {
   padding: 3px 9px; border-radius: var(--radius-pill); box-shadow: 0 4px 12px rgba(114,29,53,.35);
   animation: pulseGlow 2.4s ease-in-out infinite;
 }
-
-/* Ribbon de oferta especial — gatillo visual en la esquina superior derecha */
-.product-offer-badge {
-  position: absolute; top: 16px; right: 16px; z-index: 2;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  width: 74px; height: 74px; border-radius: 50%;
-  background: linear-gradient(140deg, var(--gold-light), var(--gold) 55%, var(--gold-dark));
-  color: var(--purple-950); text-align: center; line-height: 1.1;
-  box-shadow: 0 10px 26px rgba(185,133,124,.45);
-  transform: rotate(8deg);
-  animation: pulseGlow 2.4s ease-in-out infinite;
+.launch-offer-tag {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; width: fit-content; max-width: 100%;
+  font-family: var(--font-body); font-size: 10px; font-weight: 800; letter-spacing: .15px; line-height: 1.35;
+  text-transform: uppercase; color: var(--black-cherry); background: var(--champagne);
+  border: 1px solid rgba(114,29,53,.3); padding: 5px 10px; border-radius: var(--radius-sm);
 }
-.product-offer-badge b { font-family: var(--font-display); font-size: 17px; font-weight: 800; }
-.product-offer-badge span { font-size: 8.5px; font-weight: 800; letter-spacing: .4px; text-transform: uppercase; }
+.launch-offer-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--black-cherry); flex-shrink: 0; margin-top: 1px; animation: blink 1.6s infinite; }
+
+/* Ribbon de oferta especial — gatillo visual de alto contraste en la esquina */
+.product-offer-badge {
+  position: absolute; top: 20px; right: -56px; z-index: 3;
+  width: 190px; padding: 8px 0 7px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: linear-gradient(120deg, var(--black-cherry-dark), var(--black-cherry) 60%, var(--black-cherry-dark));
+  background-size: 200% 200%;
+  color: var(--champagne); text-align: center; line-height: 1.05;
+  box-shadow: 0 10px 24px rgba(28,11,18,.45), inset 0 0 0 1px rgba(239,225,206,.25);
+  transform: rotate(38deg);
+  animation: shimmer 3.4s ease-in-out infinite;
+}
+.product-offer-badge b { font-family: var(--font-display); font-size: 18px; font-weight: 800; color: var(--white); }
+.product-offer-badge span { font-size: 9.5px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase; color: var(--rose-gold); }
 .product-currency-note { font-size: 10.5px; color: #a8897e; font-weight: 600; margin-top: 2px; }
 
 /* ---------- Testimonials ---------- */

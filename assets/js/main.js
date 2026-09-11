@@ -439,7 +439,8 @@
             ${hasDiscount ? `<span class="price-compare">${fmtPrice(p.comparePrice, currency)}</span>` : ""}
             <span class="price-now">${fmtPrice(p.price, currency)}${hasDiscount ? `<span class="price-discount-chip">-${discountPct}%</span>` : ""}</span>
             <small>${hasDiscount ? "precio especial por tiempo limitado" : "precio de lanzamiento"}</small>
-            ${!isCop ? `<span class="product-currency-note">Precio en ${currency}</span>` : ""}`;
+            ${!isCop ? `<span class="product-currency-note">Precio en ${currency}</span>` : ""}
+            ${hasDiscount ? `<span class="launch-offer-tag">Oferta de lanzamiento · primeros 20 clientes</span>` : ""}`;
 
       const actionHtml =
         p.price == null || !isCop
@@ -450,7 +451,7 @@
       <div class="product-card reveal" style="--i:${i}">
         <div class="product-media">
           <span class="product-badge">${p.badge}</span>
-          ${hasDiscount ? `<span class="product-offer-badge"><b>-${discountPct}%</b><span>Oferta</span></span>` : ""}
+          ${hasDiscount ? `<span class="product-offer-badge"><b>-${discountPct}%</b><span>Lanzamiento</span></span>` : ""}
           <img src="${p.image}" alt="${p.name}">
         </div>
         <div class="product-body">
