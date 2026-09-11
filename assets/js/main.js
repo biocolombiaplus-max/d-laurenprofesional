@@ -7,6 +7,11 @@
   const fmtCOP = (n) =>
     n == null ? null : new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(n);
 
+  // Quita chulos/viñetas que el usuario ya trae al pegar texto (✓, ✔, •, -, etc.)
+  // para que nunca se dupliquen con el chulo que ya dibuja el diseño.
+  const BULLET_PREFIX_RE = /^[\s]*(?:[✓✔✅☑✗•·▪▸►\-–—*]\s*)+/;
+  const cleanBulletText = (s) => String(s || "").replace(BULLET_PREFIX_RE, "").trim();
+
   const CURRENCY_LOCALE = { COP: "es-CO", USD: "en-US", EUR: "de-DE" };
   function fmtPrice(n, currency) {
     if (n == null) return null;
@@ -458,7 +463,7 @@
           <h3>${p.name}</h3>
           <p class="tagline">${p.tagline}</p>
           <ul class="product-bullets">
-            ${(p.bullets || []).map((b) => `<li>${b}</li>`).join("")}
+            ${(p.bullets || []).map((b) => `<li>${cleanBulletText(b)}</li>`).join("")}
           </ul>
           <div class="product-footer">
             <div class="product-price">${priceHtml}</div>

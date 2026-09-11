@@ -639,6 +639,9 @@
     return n == null ? "Consultar" : new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(n);
   }
 
+  const BULLET_PREFIX_RE = /^[\s]*(?:[✓✔✅☑✗•·▪▸►\-–—*]\s*)+/;
+  const cleanBulletText = (s) => String(s || "").replace(BULLET_PREFIX_RE, "").trim();
+
   const ADMIN_CURRENCY_LOCALE = { COP: "es-CO", USD: "en-US", EUR: "de-DE" };
   function fmtPriceAdmin(n, currency) {
     if (n == null) return "Consultar";
@@ -728,7 +731,7 @@
           <div class="product-body">
             <h3>${escapeHtml(p.name)}</h3>
             <p class="tagline">${escapeHtml(p.tagline || "")}</p>
-            <ul class="product-bullets">${(p.bullets || []).map((b) => `<li>${escapeHtml(b)}</li>`).join("")}</ul>
+            <ul class="product-bullets">${(p.bullets || []).map((b) => `<li>${escapeHtml(cleanBulletText(b))}</li>`).join("")}</ul>
             <div class="product-footer">
               <div class="product-price">${priceHtml}</div>
             </div>
@@ -773,7 +776,7 @@
     document.getElementById("prodCurrency").value = p.currency || "COP";
     document.getElementById("prodComparePrice").value = p.comparePrice != null ? p.comparePrice : "";
     document.getElementById("prodBadge").value = p.badge || "";
-    document.getElementById("prodBullets").value = (p.bullets || []).join("\n");
+    document.getElementById("prodBullets").value = (p.bullets || []).map(cleanBulletText).join("\n");
     const previewImg = document.getElementById("prodPreviewImg");
     const previewBox = document.getElementById("prodPreviewBox");
     if (p.image) {
@@ -841,7 +844,7 @@
       const bullets = document
         .getElementById("prodBullets")
         .value.split("\n")
-        .map((s) => s.trim())
+        .map((s) => cleanBulletText(s))
         .filter(Boolean);
 
       if (!name) {
