@@ -477,6 +477,29 @@ header.site-header {
 .product-footer { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 10px; border-top: 1px dashed #eee2c8; }
 .product-price { font-family: var(--font-display); font-size: 21px; color: var(--purple-950); }
 .product-price small { display: block; font-family: var(--font-body); font-size: 11px; color: #a8897e; font-weight: 600; }
+.product-price .price-compare { display: block; font-family: var(--font-body); font-size: 13px; font-weight: 600; color: #a8897e; text-decoration: line-through; text-decoration-color: var(--black-cherry); margin-bottom: 1px; }
+.product-price .price-now { display: flex; align-items: baseline; gap: 8px; }
+.product-price .price-discount-chip {
+  display: inline-flex; align-items: center; font-family: var(--font-body); font-size: 11px; font-weight: 800;
+  letter-spacing: .3px; color: var(--white); background: linear-gradient(120deg, var(--black-cherry), var(--black-cherry-dark));
+  padding: 3px 9px; border-radius: var(--radius-pill); box-shadow: 0 4px 12px rgba(114,29,53,.35);
+  animation: pulseGlow 2.4s ease-in-out infinite;
+}
+
+/* Ribbon de oferta especial — gatillo visual en la esquina superior derecha */
+.product-offer-badge {
+  position: absolute; top: 16px; right: 16px; z-index: 2;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 74px; height: 74px; border-radius: 50%;
+  background: linear-gradient(140deg, var(--gold-light), var(--gold) 55%, var(--gold-dark));
+  color: var(--purple-950); text-align: center; line-height: 1.1;
+  box-shadow: 0 10px 26px rgba(185,133,124,.45);
+  transform: rotate(8deg);
+  animation: pulseGlow 2.4s ease-in-out infinite;
+}
+.product-offer-badge b { font-family: var(--font-display); font-size: 17px; font-weight: 800; }
+.product-offer-badge span { font-size: 8.5px; font-weight: 800; letter-spacing: .4px; text-transform: uppercase; }
+.product-currency-note { font-size: 10.5px; color: #a8897e; font-weight: 600; margin-top: 2px; }
 
 /* ---------- Testimonials ---------- */
 .testi-wrap { position: relative; max-width: 760px; margin: 0 auto; }

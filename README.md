@@ -23,7 +23,9 @@ assets/docs/                → instructivo técnico de aplicación en PDF (desc
 
 ## Qué editar primero (`assets/js/data.js`)
 
-1. **Precios**: cambia `price: null` por el valor en pesos (ej. `price: 180000`) en cada producto dentro de `PRODUCTS`. Mientras el precio esté en `null`, el sitio muestra "Consultar" y remite a WhatsApp.
+1. **Precios**: cambia `price: null` por el valor en pesos (ej. `price: 180000`) en cada producto dentro de `PRODUCTS`. Mientras el precio esté en `null`, el sitio muestra "Consultar" y remite a WhatsApp. Todo esto también se puede editar visualmente desde la pestaña "Productos" del panel administrador (`/admin.html`), incluyendo:
+   - **Moneda** (`currency`: COP, USD o EUR) — si eliges una distinta a COP, el botón de compra directa se reemplaza por "Escríbenos por WhatsApp", porque Wompi solo procesa pagos en pesos colombianos.
+   - **Precio antes** (`comparePrice`) — si es mayor al precio actual, la landing muestra el precio tachado, el % de descuento y una insignia de "Oferta" sobre la foto del producto.
 2. **Wompi**: ya está conectada la llave pública (`wompiPublicKey`) en `SITE_CONFIG` — los botones de pago abren el Checkout de Wompi automáticamente con el total del carrito. Nunca pegues aquí tu llave PRIVADA (este sitio es 100% estático y no tiene backend, así que cualquier dato en estos archivos queda visible públicamente). Si Wompi te entrega un "Secreto de integridad" (panel Wompi → Desarrolladores), puedes pegarlo en `wompiIntegritySecret` para blindar el monto contra manipulación.
 3. **Nequi**: número y titular ya configurados (`3505457420` / Juan Cáceres). Cámbialos si es necesario.
 4. **WhatsApp**: número ya configurado (`+57 350 545 7420`). Todos los botones de "WhatsApp" del sitio usan este mismo número.

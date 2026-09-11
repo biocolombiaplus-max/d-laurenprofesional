@@ -639,6 +639,14 @@
     return n == null ? "Consultar" : new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(n);
   }
 
+  const ADMIN_CURRENCY_LOCALE = { COP: "es-CO", USD: "en-US", EUR: "de-DE" };
+  function fmtPriceAdmin(n, currency) {
+    if (n == null) return "Consultar";
+    const cur = currency || "COP";
+    const locale = ADMIN_CURRENCY_LOCALE[cur] || "es-CO";
+    return new Intl.NumberFormat(locale, { style: "currency", currency: cur, maximumFractionDigits: cur === "COP" ? 0 : 2 }).format(n);
+  }
+
   async function loadProductsState() {
     try {
       const { data, error } = await supabaseClient.from("site_content").select("data").eq("key", "products").maybeSingle();
@@ -676,7 +684,7 @@
           <img src="${p.image || ""}" alt="">
           <div class="mi-info">
             <div class="mi-caption">${escapeHtml(p.name)}</div>
-            <div class="mi-meta">${fmtCOPAdmin(p.price)}${p.size ? " · " + escapeHtml(p.size) : ""}${p.badge ? " · " + escapeHtml(p.badge) : ""}</div>
+            <div class="mi-meta">${fmtPriceAdmin(p.price, p.currency)}${p.comparePrice != null && p.price != null && p.comparePrice > p.price ? ` (antes ${fmtPriceAdmin(p.comparePrice, p.currency)})` : ""}${p.size ? " · " + escapeHtml(p.size) : ""}${p.badge ? " · " + escapeHtml(p.badge) : ""}</div>
           </div>
           <div class="mi-actions">
             <button data-up="${i}" title="Subir" ${i === 0 ? "disabled" : ""}>↑</button>
@@ -697,10 +705,23 @@
     const grid = document.getElementById("productsPreviewGrid");
     if (!grid) return;
     grid.innerHTML = products
-      .map((p) => `
+      .map((p) => {
+        const currency = p.currency || "COP";
+        const hasDiscount = p.price != null && p.comparePrice != null && p.comparePrice > p.price;
+        const discountPct = hasDiscount ? Math.round((1 - p.price / p.comparePrice) * 100) : 0;
+        const priceHtml =
+          p.price == null
+            ? `Consultar<small>escríbenos por WhatsApp</small>`
+            : `
+              ${hasDiscount ? `<span class="price-compare">${fmtPriceAdmin(p.comparePrice, currency)}</span>` : ""}
+              <span class="price-now">${fmtPriceAdmin(p.price, currency)}${hasDiscount ? `<span class="price-discount-chip">-${discountPct}%</span>` : ""}</span>
+              <small>${hasDiscount ? "precio especial por tiempo limitado" : "precio de lanzamiento"}</small>
+              ${currency !== "COP" ? `<span class="product-currency-note">Precio en ${currency}</span>` : ""}`;
+        return `
         <div class="product-card">
           <div class="product-media">
             ${p.badge ? `<span class="product-badge">${escapeHtml(p.badge)}</span>` : ""}
+            ${hasDiscount ? `<span class="product-offer-badge"><b>-${discountPct}%</b><span>Oferta</span></span>` : ""}
             <img src="${p.image || ""}" alt="${escapeHtml(p.name)}">
           </div>
           <div class="product-body">
@@ -708,13 +729,11 @@
             <p class="tagline">${escapeHtml(p.tagline || "")}</p>
             <ul class="product-bullets">${(p.bullets || []).map((b) => `<li>${escapeHtml(b)}</li>`).join("")}</ul>
             <div class="product-footer">
-              <div class="product-price">
-                ${p.price != null ? fmtCOPAdmin(p.price) : "Consultar"}
-                <small>${p.price != null ? "precio de lanzamiento" : "escríbenos por WhatsApp"}</small>
-              </div>
+              <div class="product-price">${priceHtml}</div>
             </div>
           </div>
-        </div>`)
+        </div>`;
+      })
       .join("");
   }
 
@@ -750,6 +769,8 @@
     document.getElementById("prodTagline").value = p.tagline || "";
     document.getElementById("prodSize").value = p.size || "";
     document.getElementById("prodPrice").value = p.price != null ? p.price : "";
+    document.getElementById("prodCurrency").value = p.currency || "COP";
+    document.getElementById("prodComparePrice").value = p.comparePrice != null ? p.comparePrice : "";
     document.getElementById("prodBadge").value = p.badge || "";
     document.getElementById("prodBullets").value = (p.bullets || []).join("\n");
     const previewImg = document.getElementById("prodPreviewImg");
@@ -772,6 +793,8 @@
     document.getElementById("prodTagline").value = "";
     document.getElementById("prodSize").value = "";
     document.getElementById("prodPrice").value = "";
+    document.getElementById("prodCurrency").value = "COP";
+    document.getElementById("prodComparePrice").value = "";
     document.getElementById("prodBadge").value = "";
     document.getElementById("prodBullets").value = "";
     document.getElementById("prodFile").value = "";
@@ -810,6 +833,9 @@
       const size = document.getElementById("prodSize").value.trim();
       const priceRaw = document.getElementById("prodPrice").value.trim();
       const price = priceRaw === "" ? null : Number(priceRaw);
+      const currency = document.getElementById("prodCurrency").value || "COP";
+      const comparePriceRaw = document.getElementById("prodComparePrice").value.trim();
+      const comparePrice = comparePriceRaw === "" ? null : Number(comparePriceRaw);
       const badge = document.getElementById("prodBadge").value.trim();
       const bullets = document
         .getElementById("prodBullets")
@@ -835,6 +861,8 @@
         tagline,
         size,
         price,
+        currency,
+        comparePrice,
         badge: badge || "Disponible",
         image,
         bullets,

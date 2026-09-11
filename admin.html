@@ -219,11 +219,25 @@
           <input type="text" id="prodSize" placeholder="Ej: 250 ML">
         </div>
         <div class="field" style="flex:1">
-          <label>Precio (COP)</label>
+          <label>Precio</label>
           <input type="number" id="prodPrice" placeholder="Ej: 320000" min="0" step="1000">
         </div>
+        <div class="field" style="flex:.7">
+          <label>Moneda</label>
+          <select id="prodCurrency">
+            <option value="COP">COP — Colombia</option>
+            <option value="USD">USD — Dólar</option>
+            <option value="EUR">EUR — Euro</option>
+          </select>
+        </div>
       </div>
-      <p class="admin-hint">Deja el precio vacío para mostrar "Consultar" y remitir al cliente a WhatsApp.</p>
+      <p class="admin-hint">Deja el precio vacío para mostrar "Consultar" y remitir al cliente a WhatsApp. Si publicas en una moneda distinta a COP, el botón de compra directa se reemplaza por "Escríbenos por WhatsApp" — los pagos en línea (Wompi) solo procesan en pesos colombianos.</p>
+
+      <div class="field">
+        <label>Precio antes (opcional — activa el gatillo de oferta especial)</label>
+        <input type="number" id="prodComparePrice" placeholder="Ej: 420000" min="0" step="1000">
+        <p class="admin-hint">Si es mayor al precio actual, en la landing se muestra tachado junto con el % de descuento y una insignia de "Oferta" en la foto del producto.</p>
+      </div>
 
       <div class="field">
         <label>Insignia (opcional)</label>

@@ -54,6 +54,8 @@ const PRODUCTS = [
     tagline: "Ideal para probar el resultado D'Laurent",
     size: "120 ML",
     price: null, // ej: 180000
+    currency: "COP", // COP, USD o EUR — moneda en la que se publica el precio
+    comparePrice: null, // ej: 220000 — precio "antes" para mostrar oferta especial tachada
     badge: "Iniciación",
     image: "assets/img/kit-120.svg",
     bullets: [
@@ -68,6 +70,8 @@ const PRODUCTS = [
     tagline: "El favorito de salones que atienden a diario",
     size: "250 ML",
     price: null, // ej: 320000
+    currency: "COP",
+    comparePrice: null,
     badge: "Más vendido",
     image: "assets/img/kit-250.svg",
     bullets: [
@@ -82,6 +86,8 @@ const PRODUCTS = [
     tagline: "Rendimiento profesional para alto volumen",
     size: "500 ML",
     price: null, // ej: 560000
+    currency: "COP",
+    comparePrice: null,
     badge: "Mejor rendimiento",
     image: "assets/img/kit-500.svg",
     bullets: [

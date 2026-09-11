@@ -7,6 +7,14 @@
   const fmtCOP = (n) =>
     n == null ? null : new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(n);
 
+  const CURRENCY_LOCALE = { COP: "es-CO", USD: "en-US", EUR: "de-DE" };
+  function fmtPrice(n, currency) {
+    if (n == null) return null;
+    const cur = currency || "COP";
+    const locale = CURRENCY_LOCALE[cur] || "es-CO";
+    return new Intl.NumberFormat(locale, { style: "currency", currency: cur, maximumFractionDigits: cur === "COP" ? 0 : 2 }).format(n);
+  }
+
   const waBase = `https://wa.me/${SITE_CONFIG.whatsappNumber}`;
   const waLink = (msg) => `${waBase}?text=${encodeURIComponent(msg)}`;
 
@@ -418,11 +426,31 @@
 
   function renderProducts() {
     const grid = document.getElementById("productGrid");
-    grid.innerHTML = PRODUCTS.map(
-      (p, i) => `
+    grid.innerHTML = PRODUCTS.map((p, i) => {
+      const currency = p.currency || "COP";
+      const isCop = currency === "COP";
+      const hasDiscount = p.price != null && p.comparePrice != null && p.comparePrice > p.price;
+      const discountPct = hasDiscount ? Math.round((1 - p.price / p.comparePrice) * 100) : 0;
+
+      const priceHtml =
+        p.price == null
+          ? `Consultar<small>escríbenos por WhatsApp</small>`
+          : `
+            ${hasDiscount ? `<span class="price-compare">${fmtPrice(p.comparePrice, currency)}</span>` : ""}
+            <span class="price-now">${fmtPrice(p.price, currency)}${hasDiscount ? `<span class="price-discount-chip">-${discountPct}%</span>` : ""}</span>
+            <small>${hasDiscount ? "precio especial por tiempo limitado" : "precio de lanzamiento"}</small>
+            ${!isCop ? `<span class="product-currency-note">Precio en ${currency}</span>` : ""}`;
+
+      const actionHtml =
+        p.price == null || !isCop
+          ? `<a href="${waLink(`Hola D'Laurent Professional 👋, quiero información de ${p.name}${p.price != null ? ` (${fmtPrice(p.price, currency)})` : ""}.`)}" target="_blank" rel="noopener" class="btn btn-whatsapp btn-sm">Escríbenos</a>`
+          : `<button class="btn btn-dark btn-sm" data-add="${p.id}">Agregar</button>`;
+
+      return `
       <div class="product-card reveal" style="--i:${i}">
         <div class="product-media">
           <span class="product-badge">${p.badge}</span>
+          ${hasDiscount ? `<span class="product-offer-badge"><b>-${discountPct}%</b><span>Oferta</span></span>` : ""}
           <img src="${p.image}" alt="${p.name}">
         </div>
         <div class="product-body">
@@ -432,15 +460,12 @@
             ${(p.bullets || []).map((b) => `<li>${b}</li>`).join("")}
           </ul>
           <div class="product-footer">
-            <div class="product-price">
-              ${p.price != null ? fmtCOP(p.price) : "Consultar"}
-              <small>${p.price != null ? "precio de lanzamiento" : "escríbenos por WhatsApp"}</small>
-            </div>
-            <button class="btn btn-dark btn-sm" data-add="${p.id}">Agregar</button>
+            <div class="product-price">${priceHtml}</div>
+            ${actionHtml}
           </div>
         </div>
-      </div>`
-    ).join("");
+      </div>`;
+    }).join("");
 
     grid.querySelectorAll("[data-add]").forEach((btn) => {
       btn.addEventListener("click", () => addToCart(btn.dataset.add));
